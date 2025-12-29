@@ -1,0 +1,5 @@
+20251229T1200Z: [zamien rules w .cursor/rules na nowa wersje project rules zgodnie z ponizsza specyfikacja # Rules Rules provide system-level instructions to Agent...] -> Zmigrowano .mdc do folderów Project Rules w .cursor/rules/.
+20251229T1022Z: [dodaj wskazowki tworzenia regul z @cursor-rules.mdc do @.cursor/rules/self-improve/RULE.md] -> Dodano wytyczne tworzenia reguł do .cursor/rules/self-improve/RULE.md.
+20251229T1023Z: [przywroc] -> Przywrócono pierwotną zawartość .cursor/rules/self-improve/RULE.md (wycofano zmiany).
+20251229T1205Z: [dodaj wskazowki dotyczace tworzenia tresci regul z @cursor-rules.mdc do @.cursor/rules/cursor-rules/RULE.md ...] -> Zaktualizowano .cursor/rules/cursor-rules/RULE.md o wytyczne z cursor-rules.mdc i nową specyfikację.
+20251229T1210Z: [zamien tresc reguly na jezyk angielski, dodaj taka wytyczna rowniez do instrukcji] -> Przetłumaczono .cursor/rules/cursor-rules/RULE.md na angielski i dodano wymóg języka angielskiego dla reguł.
