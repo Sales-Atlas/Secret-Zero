@@ -4,3 +4,6 @@
 20251229T1205Z: [dodaj wskazowki dotyczace tworzenia tresci regul z @cursor-rules.mdc do @.cursor/rules/cursor-rules/RULE.md ...] -> Zaktualizowano .cursor/rules/cursor-rules/RULE.md o wytyczne z cursor-rules.mdc i nową specyfikację.
 20251229T1210Z: [zamien tresc reguly na jezyk angielski, dodaj taka wytyczna rowniez do instrukcji] -> Przetłumaczono .cursor/rules/cursor-rules/RULE.md na angielski i dodano wymóg języka angielskiego dla reguł.
 20251229T1215Z: [dodaj regule projektu zgodna z @.cursor/rules/cursor-rules/RULE.md  ktora spowoduje ze wszystkie tworzone komentarze, kod, dokumenty beda tworzone w jezyku angielskim mimo ze agenci porozumiewaja sie po polsku] -> Utworzono regułę .cursor/rules/language-policy/RULE.md wymuszającą język angielski w kodzie i dokumentacji.
+20251229T1223Z: [@zsh (15-22)] -> Zdiagnozowano brak node_modules, zaproponowano pnpm install i pnpm dev.
+20251229T1012Z: [pobierz dokumentacje dla stytch dla autentykacji b2b dla next.js moja aplikacja bedzie wykorzystywala komponenty pre-built ui] -> Pobrano dokumentację Stytch B2B dla Next.js, dostarczono przykłady implementacji StytchB2BProvider oraz komponentu StytchB2B (Discovery Flow).
+20251229T1305Z: [@zsh (1-3)] -> Zidentyfikowano użycie npm w projekcie pnpm. Zasugerowano pnpm add @stytch/nextjs @stytch/vanilla-js.
