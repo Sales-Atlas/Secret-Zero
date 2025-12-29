@@ -3,3 +3,4 @@
 20251229T1023Z: [przywroc] -> Przywrócono pierwotną zawartość .cursor/rules/self-improve/RULE.md (wycofano zmiany).
 20251229T1205Z: [dodaj wskazowki dotyczace tworzenia tresci regul z @cursor-rules.mdc do @.cursor/rules/cursor-rules/RULE.md ...] -> Zaktualizowano .cursor/rules/cursor-rules/RULE.md o wytyczne z cursor-rules.mdc i nową specyfikację.
 20251229T1210Z: [zamien tresc reguly na jezyk angielski, dodaj taka wytyczna rowniez do instrukcji] -> Przetłumaczono .cursor/rules/cursor-rules/RULE.md na angielski i dodano wymóg języka angielskiego dla reguł.
+20251229T1215Z: [dodaj regule projektu zgodna z @.cursor/rules/cursor-rules/RULE.md  ktora spowoduje ze wszystkie tworzone komentarze, kod, dokumenty beda tworzone w jezyku angielskim mimo ze agenci porozumiewaja sie po polsku] -> Utworzono regułę .cursor/rules/language-policy/RULE.md wymuszającą język angielski w kodzie i dokumentacji.
