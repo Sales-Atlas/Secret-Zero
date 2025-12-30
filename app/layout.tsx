@@ -14,8 +14,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Secure Secret Portal | ISCP",
-  description: "Bezpiecznie przekaż dane dostępowe do naszego skarbca",
-  robots: "noindex, nofollow", // Nie indeksuj - aplikacja wewnętrzna
+  description: "Securely transfer your credentials to our vault",
+  robots: "noindex, nofollow", // Do not index - internal application
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="font-sans antialiased bg-slate-900 text-slate-100">
         {children}
       </body>

@@ -2,11 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /**
-   * Konfiguracja bezpieczeństwa ISCP
-   * Wyłącza logowanie wrażliwych danych i ogranicza wielkość payloadów
+   * ISCP Security Configuration
+   * Disables logging of sensitive data and limits payload sizes
    */
   
-  // Wyłącz logowanie żądań i URL-i z parametrami (mogą zawierać tokeny)
+  // Disable request and URL logging (may contain tokens)
   logging: {
     fetches: {
       fullUrl: false,
@@ -14,18 +14,18 @@ const nextConfig: NextConfig = {
     incomingRequests: false,
   },
 
-  // Konfiguracja eksperymentalna
+  // Experimental features
   experimental: {
     // Server Actions
     serverActions: {
-      // Ograniczenie wielkości payloadu (zaszyfrowane dane)
+      // Limit payload size (encrypted data)
       bodySizeLimit: "100kb",
     },
-    // React Taint API - zapobiega przypadkowemu przekazaniu sekretów do klienta
+    // React Taint API - prevents accidental secret leakage to client
     taint: true,
   },
 
-  // Nagłówki bezpieczeństwa
+  // Security headers
   async headers() {
     return [
       {

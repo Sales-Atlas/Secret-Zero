@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 export default async function HomePage() {
-  // Sprawdź czy użytkownik jest zalogowany
+  // Check if user is logged in
   const cookieStore = await cookies();
   const sessionJwt = cookieStore.get("stytch_session_jwt")?.value;
 
-  // Jeśli zalogowany, przekieruj do dashboard
+  // If logged in, redirect to dashboard
   if (sessionJwt) {
     redirect("/dashboard");
   }
@@ -31,8 +31,8 @@ export default async function HomePage() {
               Secure Secret Portal
             </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Bezpiecznie przekaż dane dostępowe do naszego skarbca.
-              Szyfrowanie end-to-end chroni Twoje dane na każdym kroku.
+              Securely transfer your credentials to our vault.
+              End-to-end encryption protects your data at every step.
             </p>
           </div>
 
@@ -43,7 +43,7 @@ export default async function HomePage() {
                 size="lg"
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-6 text-lg rounded-xl shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40"
               >
-                Rozpocznij
+                Get Started
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
@@ -58,11 +58,11 @@ export default async function HomePage() {
                 <Shield className="w-7 h-7 text-blue-400" />
               </div>
               <h3 className="text-xl font-semibold text-white">
-                Szyfrowanie E2E
+                E2E Encryption
               </h3>
               <p className="text-slate-400">
-                Dane są szyfrowane w Twojej przeglądarce przed wysłaniem.
-                Nikt pośredniczący nie ma do nich dostępu.
+                Data is encrypted in your browser before transmission.
+                No intermediary has access to your secrets.
               </p>
             </div>
           </Card>
@@ -76,8 +76,8 @@ export default async function HomePage() {
                 Zero-Trust
               </h3>
               <p className="text-slate-400">
-                Architektura Write-Only gwarantuje, że nawet w przypadku
-                kompromitacji systemu, dane pozostają bezpieczne.
+                Write-Only architecture ensures that even in case of
+                system compromise, your data remains secure.
               </p>
             </div>
           </Card>
@@ -91,8 +91,8 @@ export default async function HomePage() {
                 SOC2 Compliant
               </h3>
               <p className="text-slate-400">
-                System spełnia wymagania SOC2, ISO 27001 i RODO.
-                Pełna audytowalność wszystkich operacji.
+                System meets SOC2, ISO 27001, and GDPR requirements.
+                Full auditability of all operations.
               </p>
             </div>
           </Card>
@@ -101,15 +101,15 @@ export default async function HomePage() {
         {/* How it works */}
         <div className="mt-24">
           <h2 className="text-3xl font-bold text-white text-center mb-12">
-            Jak to działa?
+            How It Works
           </h2>
           
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: 1, title: "Logowanie", desc: "Zaloguj się przez magic link wysłany na email" },
-              { step: 2, title: "Wypełnij formularz", desc: "Podaj dane dostępowe do aplikacji" },
-              { step: 3, title: "Szyfrowanie", desc: "Dane są szyfrowane w przeglądarce" },
-              { step: 4, title: "Bezpieczny zapis", desc: "Zapisujemy je w naszym skarbcu" },
+              { step: 1, title: "Login", desc: "Sign in via magic link sent to your email" },
+              { step: 2, title: "Fill the Form", desc: "Enter application credentials" },
+              { step: 3, title: "Encryption", desc: "Data is encrypted in your browser" },
+              { step: 4, title: "Secure Storage", desc: "We store them in our vault" },
             ].map((item) => (
               <div key={item.step} className="text-center space-y-3">
                 <div className="mx-auto w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center text-xl font-bold text-emerald-400">
@@ -127,7 +127,7 @@ export default async function HomePage() {
       <footer className="border-t border-slate-800 py-8 mt-24">
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-slate-500">
           <p>
-            Secure Secret Portal • Szyfrowanie AES-256-GCM + RSA-2048
+            Secure Secret Portal • AES-256-GCM + RSA-2048 Encryption
           </p>
         </div>
       </footer>
