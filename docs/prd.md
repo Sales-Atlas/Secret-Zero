@@ -339,7 +339,7 @@ The ISCP project supports SOC2 compliance through:
 * **Audit Trails:** Every secret write operation is logged in Infisical (who: Machine Identity, where: client path). Backend should additionally log event metadata (without secret values) linked to Stytch user ID.  
 * **Access Control:** Rigorous role separation. Consultant does not see password during transmission. Client loses access to it after sending.
 
-### **8.2 GDPR / GDPR**
+### **8.2 GDPR**
 
 * **Data Minimization:** System stores only business emails necessary for login.  
 * **Right to Be Forgotten:** User deletion in Stytch (via API or Dashboard) automatically cuts off their access.  
