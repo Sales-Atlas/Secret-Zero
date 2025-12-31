@@ -315,11 +315,11 @@ TypeScript
 // schemas/deposit.ts  
 import { z } from "zod";
 
-export const DepositSchema = z.object({  
-  encryptedData: z.string().base64(), // Base64 ciphertext (contains JSON with url, login, etc)  
-  encryptedKey: z.string().base64(),  // Base64 encrypted AES key  
-  iv: z.string().base64(),            // Base64 Initialization Vector  
-  orgId: z.string().uuid(),  
+export const DepositSchema = z.object({
+  encryptedData: z.string().base64(), // Base64 ciphertext (contains JSON with url, login, etc)
+  encryptedKey: z.string().base64(),  // Base64 encrypted AES key
+  iv: z.string().base64(),            // Base64 Initialization Vector
+  organizationSlug: z.string(),
 });
 
 ### **7.3 Data Access Layer (DAL) Guidelines**
