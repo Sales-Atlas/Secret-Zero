@@ -196,7 +196,7 @@ Before sending the form (onSubmit):
 3. Create a JSON object containing filled fields: { url, login, password, apiToken }.  
 4. Encrypt the entire JSON object with the sessionKey.  
 5. Encrypt the sessionKey with the RSA public key.  
-6. Send payload: { encryptedData, encryptedSessionKey, iv, authTag } to Server Action.5
+6. Send payload: { encryptedData, encryptedSessionKey, iv } to Server Action.5
 
 ### **5.3 Server Action: depositSecret**
 
