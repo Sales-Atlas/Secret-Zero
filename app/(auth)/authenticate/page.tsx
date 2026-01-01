@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authenticateDiscoveryAction, selectOrganizationAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -27,15 +27,41 @@ export default function AuthenticatePage() {
   const token = searchParams.get("token");
   const tokenType = searchParams.get("stytch_token_type");
 
+  const handleSelectOrganization = useCallback(async (
+    organizationId: string,
+    ist?: string
+  ) => {
+    const tokenToUse = ist || intermediateToken;
+
+    if (!tokenToUse) {
+      setError("Missing session token");
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await selectOrganizationAction(tokenToUse, organizationId);
+
+      if (result.success) {
+        router.push(`/deposit/${result.data?.organizationSlug}`);
+      } else {
+        setError(result.error || "Organization selection error");
+      }
+    });
+  }, [intermediateToken, router]);
+
   useEffect(() => {
     if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError("Missing token in URL. Please use the link from your email.");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAuthenticating(false);
       return;
     }
 
     if (tokenType !== "discovery") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError("Invalid token type.");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAuthenticating(false);
       return;
     }
@@ -43,11 +69,11 @@ export default function AuthenticatePage() {
     // Authenticate token
     startTransition(async () => {
       const result = await authenticateDiscoveryAction(token);
-      
+
       if (result.success && result.data) {
         setIntermediateToken(result.data.intermediateSessionToken);
         setOrganizations(result.data.discoveredOrganizations);
-        
+
         // If only one organization, select automatically
         if (result.data.discoveredOrganizations.length === 1) {
           await handleSelectOrganization(
@@ -58,32 +84,10 @@ export default function AuthenticatePage() {
       } else {
         setError(result.error || "Authentication error");
       }
-      
+
       setIsAuthenticating(false);
     });
-  }, [token, tokenType]);
-
-  const handleSelectOrganization = async (
-    organizationId: string,
-    ist?: string
-  ) => {
-    const tokenToUse = ist || intermediateToken;
-    
-    if (!tokenToUse) {
-      setError("Missing session token");
-      return;
-    }
-
-    startTransition(async () => {
-      const result = await selectOrganizationAction(tokenToUse, organizationId);
-      
-      if (result.success) {
-        router.push(`/deposit/${result.data?.organizationSlug}`);
-      } else {
-        setError(result.error || "Organization selection error");
-      }
-    });
-  };
+  }, [token, tokenType, handleSelectOrganization]);
 
   // Loading state
   if (isAuthenticating) {

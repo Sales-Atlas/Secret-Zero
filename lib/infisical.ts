@@ -87,26 +87,26 @@ export async function createSecret(options: CreateSecretOptions): Promise<string
 
   try {
     await client.secrets().createSecret(secretKey, {
+      secretValue: options.secretValue,
       environment,
       projectId,
-      secretValue: options.secretValue,
       secretPath: options.secretPath,
       secretComment: options.secretComment,
     });
   } catch (error) {
     // Check if this is a duplicate error (secret already exists)
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     if (errorMessage.includes("already exists") || errorMessage.includes("duplicate")) {
       // Add timestamp suffix and retry
       secretKey = `${options.secretKey}${generateTimestampSuffix()}`;
-      
+
       console.log(`[Infisical] Secret exists, using suffix: ${secretKey}`);
-      
+
       await client.secrets().createSecret(secretKey, {
+        secretValue: options.secretValue,
         environment,
         projectId,
-        secretValue: options.secretValue,
         secretPath: options.secretPath,
         secretComment: `${options.secretComment} (duplicate - previous secret exists)`,
       });
