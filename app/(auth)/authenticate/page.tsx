@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition, useCallback } from "react";
+import { useEffect, useState, useTransition, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authenticateDiscoveryAction, selectOrganizationAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -17,11 +17,14 @@ export default function AuthenticatePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  
+
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [organizations, setOrganizations] = useState<DiscoveredOrganization[]>([]);
   const [intermediateToken, setIntermediateToken] = useState<string | null>(null);
+
+  // Guard to prevent re-execution of authentication
+  const hasAuthenticatedRef = useRef(false);
 
   // Get token from URL
   const token = searchParams.get("token");
@@ -50,21 +53,25 @@ export default function AuthenticatePage() {
   }, [intermediateToken, router]);
 
   useEffect(() => {
+    // Prevent re-execution after successful authentication
+    if (hasAuthenticatedRef.current) {
+      return;
+    }
+
     if (!token) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError("Missing token in URL. Please use the link from your email.");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAuthenticating(false);
       return;
     }
 
     if (tokenType !== "discovery") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError("Invalid token type.");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAuthenticating(false);
       return;
     }
+
+    // Mark as authenticated to prevent re-execution
+    hasAuthenticatedRef.current = true;
 
     // Authenticate token
     startTransition(async () => {
@@ -87,7 +94,10 @@ export default function AuthenticatePage() {
 
       setIsAuthenticating(false);
     });
-  }, [token, tokenType, handleSelectOrganization]);
+    // handleSelectOrganization is intentionally not in dependencies to prevent re-execution
+    // when intermediateToken changes. The token is passed directly as a parameter.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, tokenType]);
 
   // Loading state
   if (isAuthenticating) {
