@@ -56,7 +56,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 /**
  * Converts Base64 to ArrayBuffer
  */
-function base64ToArrayBuffer(base64: string): ArrayBuffer {
+export function base64ToArrayBuffer(base64: string): ArrayBuffer {
   const binaryString = atob(base64);
   const bytes = new Uint8Array(binaryString.length);
   for (let i = 0; i < binaryString.length; i++) {
@@ -114,7 +114,7 @@ export async function encryptPayload(
   return {
     encryptedData: arrayBufferToBase64(encryptedDataBuffer),
     encryptedKey: arrayBufferToBase64(encryptedKeyBuffer),
-    iv: arrayBufferToBase64(iv),
+    iv: arrayBufferToBase64(iv.buffer),
   };
 }
 

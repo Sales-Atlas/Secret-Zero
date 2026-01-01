@@ -9,7 +9,6 @@ import { depositSecretAction } from "@/actions/deposit";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
-import { Label } from "@/components/ui/label";
 import {
   Globe,
   User,
@@ -24,10 +23,9 @@ import {
 
 interface SecretFormProps {
   organizationSlug: string;
-  userEmail: string;
 }
 
-export function SecretForm({ organizationSlug, userEmail }: SecretFormProps) {
+export function SecretForm({ organizationSlug }: SecretFormProps) {
   const [isPending, startTransition] = useTransition();
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
