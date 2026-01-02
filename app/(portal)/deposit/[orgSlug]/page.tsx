@@ -84,10 +84,7 @@ export default async function DepositPage({ params }: DepositPageProps) {
               </div>
             }
           >
-            <SecretForm
-              organizationSlug={session.organizationSlug}
-              userEmail={session.email}
-            />
+            <SecretForm organizationSlug={session.organizationSlug} />
           </Suspense>
         </Card>
 

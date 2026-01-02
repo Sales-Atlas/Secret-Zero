@@ -97,15 +97,12 @@ export async function selectOrganizationAction(
 /**
  * Logs out the user (removes cookie)
  */
-export async function logoutAction(): Promise<ActionResult> {
+export async function logoutAction(): Promise<void> {
   try {
     const cookieStore = await cookies();
     cookieStore.delete(SESSION_COOKIE_NAME);
-    
-    return { success: true };
   } catch (error) {
     console.error("[Auth] Logout error:", error);
-    return { success: false, error: "Logout error" };
   }
 }
 
