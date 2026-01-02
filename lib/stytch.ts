@@ -58,11 +58,13 @@ export async function authenticateDiscoveryMagicLink(
   return {
     intermediateSessionToken: response.intermediate_session_token,
     email: response.email_address,
-    discoveredOrganizations: response.discovered_organizations.map((org) => ({
-      organizationId: org.organization?.organization_id || "",
-      organizationName: org.organization?.organization_name || "",
-      organizationSlug: org.organization?.organization_slug || "",
-    })),
+    discoveredOrganizations: response.discovered_organizations
+      .filter((org) => !!org.organization)
+      .map((org) => ({
+        organizationId: org.organization!.organization_id,
+        organizationName: org.organization!.organization_name,
+        organizationSlug: org.organization!.organization_slug,
+      })),
   };
 }
 

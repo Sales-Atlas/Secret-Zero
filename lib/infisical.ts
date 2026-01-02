@@ -86,6 +86,13 @@ export async function createFolder(folderPath: string): Promise<void> {
   // Extract folder name from path (e.g., "/test-org" -> "test-org")
   const folderName = folderPath.startsWith("/") ? folderPath.slice(1) : folderPath;
 
+  // Validate that the path is not nested (e.g., "foo/bar" is invalid)
+  if (folderName.includes("/")) {
+    throw new Error(
+      `Nested folder paths are not supported. Expected format: "/org-slug" but got: "${folderPath}"`
+    );
+  }
+
   try {
     await client.folders().create({
       name: folderName,
@@ -179,7 +186,7 @@ export interface DepositResult {
 /**
  * Saves a complete set of secrets for an application
  * Creates secrets: {PREFIX}_URL, {PREFIX}_LOGIN, {PREFIX}_PASSWORD, {PREFIX}_API_TOKEN
- * 
+ *
  * In case of duplicates, automatically adds timestamp suffix
  */
 export async function depositSecrets(
@@ -190,6 +197,9 @@ export async function depositSecrets(
   const secretPath = `/${organizationSlug}`;
   const comment = `Deposited via ISCP Portal - ${new Date().toISOString()}`;
   const createdKeys: string[] = [];
+
+  // Ensure organization folder exists before creating secrets
+  await createFolder(secretPath);
 
   // Always save URL (required)
   const urlKey = await createSecret({
