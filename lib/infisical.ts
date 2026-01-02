@@ -69,10 +69,47 @@ function generateTimestampSuffix(): string {
 }
 
 /**
+ * Creates a folder in Infisical
+ * Required before creating secrets in a new organization path
+ *
+ * @param folderPath - Full path like "/test-org" or "/acme-corp"
+ */
+export async function createFolder(folderPath: string): Promise<void> {
+  const client = await getInfisicalClient();
+  const projectId = process.env.INFISICAL_PROJECT_ID;
+  const environment = process.env.INFISICAL_ENVIRONMENT || "prod";
+
+  if (!projectId) {
+    throw new Error("Missing INFISICAL_PROJECT_ID in environment variables");
+  }
+
+  // Extract folder name from path (e.g., "/test-org" -> "test-org")
+  const folderName = folderPath.startsWith("/") ? folderPath.slice(1) : folderPath;
+
+  try {
+    await client.folders().create({
+      name: folderName,
+      path: "/", // Parent path (root)
+      environment,
+      projectId,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Ignore if folder already exists
+    if (!errorMessage.includes("already exists")) {
+      throw error;
+    }
+  }
+}
+
+/**
  * Creates a new secret in Infisical
  * Uses Write-Only role - cannot read secrets
- * 
+ *
  * In case of conflict (secret already exists) adds timestamp suffix
+ *
+ * Note: Folder must exist before creating secrets. Use createFolder() first.
  */
 export async function createSecret(options: CreateSecretOptions): Promise<string> {
   const client = await getInfisicalClient();
