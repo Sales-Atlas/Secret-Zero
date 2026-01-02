@@ -126,7 +126,7 @@ function FieldLabel({
   )
 }
 
-function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
+function FieldTitle({ className, children, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="field-label"
@@ -135,7 +135,9 @@ function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </div>
   )
 }
 

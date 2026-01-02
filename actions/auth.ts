@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import {
   sendDiscoveryMagicLink,
   authenticateDiscoveryMagicLink,
@@ -95,15 +96,16 @@ export async function selectOrganizationAction(
 }
 
 /**
- * Logs out the user (removes cookie)
+ * Logs out the user (removes cookie and redirects to login)
  */
-export async function logoutAction(): Promise<void> {
+export async function logoutAction(): Promise<never> {
   try {
     const cookieStore = await cookies();
     cookieStore.delete(SESSION_COOKIE_NAME);
   } catch (error) {
     console.error("[Auth] Logout error:", error);
   }
+  redirect("/login");
 }
 
 /**

@@ -34,11 +34,20 @@ export function extractAppNameFromUrl(url: string): string {
     // Handle both standard TLDs and country-code TLDs
     let domainParts = parts;
     if (parts.length >= 2) {
+      const tld = parts[parts.length - 1];
       // Remove last part (TLD)
       domainParts = parts.slice(0, -1);
 
-      // If there's a country code (e.g., .co.uk), remove another part
-      if (domainParts.length >= 2 && domainParts[domainParts.length - 1].length === 2) {
+      // Known second-level country-code domains (e.g., .co in .co.uk, .com in .com.au)
+      const secondLevelCCTLDs = ['co', 'com', 'ac', 'gov', 'edu', 'org', 'net', 'mil', 'nom', 'sch'];
+      const potentialSecondLevel = domainParts[domainParts.length - 1];
+
+      // Only strip if it's a known second-level domain AND TLD is a 2-char country code
+      if (
+        domainParts.length >= 2 &&
+        secondLevelCCTLDs.includes(potentialSecondLevel.toLowerCase()) &&
+        tld.length === 2
+      ) {
         domainParts = domainParts.slice(0, -1);
       }
     }
@@ -46,10 +55,18 @@ export function extractAppNameFromUrl(url: string): string {
     // Common subdomains to ignore
     const ignoredSubdomains = ["app", "www", "api", "web", "portal", "admin", "dashboard"];
 
-    // Filter out ignored subdomains and get the main domain
-    const mainDomainParts = domainParts.filter(
-      part => !ignoredSubdomains.includes(part.toLowerCase())
-    );
+    // Filter out ignored subdomains only if we have multiple parts
+    // If we only have one part, it's the main domain (e.g., "app.com" → keep "app")
+    let mainDomainParts: string[];
+    if (domainParts.length === 1) {
+      // Single part - this is the main domain, don't filter it
+      mainDomainParts = domainParts;
+    } else {
+      // Multiple parts - filter out ignored subdomains (e.g., "app.pipedrive.com" → "pipedrive")
+      mainDomainParts = domainParts.filter(
+        part => !ignoredSubdomains.includes(part.toLowerCase())
+      );
+    }
 
     // Get the last remaining part (the main domain)
     const appName = mainDomainParts[mainDomainParts.length - 1];

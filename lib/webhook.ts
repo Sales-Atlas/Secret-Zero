@@ -54,18 +54,30 @@ export async function sendDepositNotification(
   }
 
   try {
+    // Prepare webhook payload
+    const webhookPayload = {
+      event: "secret.deposited",
+      data: payload,
+    };
+    const payloadString = JSON.stringify(webhookPayload);
+
+    // Generate HMAC signature if webhook secret is configured
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (env.WEBHOOK_SECRET) {
+      const signature = await createWebhookSignature(
+        payloadString,
+        env.WEBHOOK_SECRET
+      );
+      headers["X-Webhook-Signature"] = signature;
+    }
+
     const response = await fetch(webhookUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(env.WEBHOOK_SECRET && {
-          "X-Webhook-Secret": env.WEBHOOK_SECRET,
-        }),
-      },
-      body: JSON.stringify({
-        event: "secret.deposited",
-        data: payload,
-      }),
+      headers,
+      body: payloadString,
     });
 
     if (!response.ok) {
@@ -118,8 +130,15 @@ export async function verifyWebhookSignature(
 
   // Use timing-safe comparison to prevent timing attacks
   const crypto = await import("node:crypto");
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  );
+
+  const signatureBuffer = Buffer.from(signature, "hex");
+  const expectedBuffer = Buffer.from(expectedSignature, "hex");
+
+  // timingSafeEqual throws if buffers have different lengths
+  // Check length first to ensure we return false instead of throwing
+  if (signatureBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(signatureBuffer, expectedBuffer);
 }
