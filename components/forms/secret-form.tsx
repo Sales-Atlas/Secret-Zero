@@ -23,9 +23,10 @@ import {
 
 interface SecretFormProps {
   organizationSlug: string;
+  publicKey: string;
 }
 
-export function SecretForm({ organizationSlug }: SecretFormProps) {
+export function SecretForm({ organizationSlug, publicKey }: SecretFormProps) {
   const [isPending, startTransition] = useTransition();
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -53,9 +54,7 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
 
     startTransition(async () => {
       try {
-        // Get public key
-        const publicKey = process.env.NEXT_PUBLIC_SERVER_PUBLIC_KEY;
-        
+        // Validate public key is available
         if (!publicKey) {
           throw new Error("Missing server public key");
         }
@@ -86,8 +85,10 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
         }
       } catch (error) {
         console.error("Encryption error:", error);
+        console.error("Error message:", error instanceof Error ? error.message : String(error));
+        console.error("Error stack:", error instanceof Error ? error.stack : "No stack");
         setSubmitStatus("error");
-        setErrorMessage("Data encryption error");
+        setErrorMessage(error instanceof Error ? error.message : "Data encryption error");
       }
     });
   };

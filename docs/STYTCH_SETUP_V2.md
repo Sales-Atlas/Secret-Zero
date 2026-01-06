@@ -310,7 +310,7 @@ pnpm tsx scripts/test-stytch-integration.ts
 
 ## Environment Variables
 
-Add to your `.env.local`:
+Create or update your `.env.local` file with the following variables:
 
 ```env
 # Stytch Configuration
@@ -318,9 +318,34 @@ STYTCH_PROJECT_ID=project-test-xxx-xxx
 STYTCH_SECRET=secret-test-xxx-xxx
 NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN=public-token-test-xxx
 
+# Infisical Configuration (from INFISICAL_SETUP.md)
+INFISICAL_CLIENT_ID=xxx-xxx-xxx
+INFISICAL_CLIENT_SECRET=xxx-xxx-xxx
+INFISICAL_PROJECT_ID=xxx-xxx-xxx
+INFISICAL_SITE_URL=https://app.infisical.com
+INFISICAL_ENVIRONMENT=prod
+
+# RSA Encryption Keys (from VERCEL_DEPLOYMENT.md)
+SERVER_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQDWC28RrWlGM7Q1EpYyiwqW7Yk7NLLfnlKiTHJBu8jw6tgxiMui\nl69oRyWCjs0/K7GND1Y5KvhMoHjVeug5dYq0BXH1p2qQJdnqlYNDIpgAMLuE+oJm\n6L8stsnpwixcKCp9Lc/cdZ7xy472lZZPVrb/cHn0MpDeY0Kbh9GxRzWCyQIDAQAB\nAoGACHmtbTLDn17+vLc+sUOmKLHBJFIC3y3iscB7KbUo0LlL1DJJdeexr1xZ1OCY\nqe6t+hroXB0idc5I2pMiTNwloMaZlhmDkRvtWMey+GvsrGLyg7RMJW6S+D5QS2kp\nKK5V92RlyZRbW7UHEAMImVXz4PrCx9N4PVwLMl/vTVe0kQ0CQQD9i5OD6tlAwO35\nOZxp2qAZFx8guRaKQmaC4wBDmiirxRU8sWmgF2rBLUfLStdlbsBQpR75SNfHb3K3\nxK1zSqsTAkEA2B30IfQPuyA3mXOQ7hnH6S/s0v6Df372ak3uYc6woCSFNJQkSyC6\nAVQQpIy9PWt4xbATpTMHqngQIwxlS2SaMwJBAMg58J3t2fG8KnJ136LspyAJVWi3\nIii/dUsJz0yTsmir9DCA/qQRuhmiE59klCOjSbamH4bH0rfJuHONm1h/8AcCQEY8\nfeInApHLJ6asY1audET5uVrdMnlWFtl3mFibJtX06IGs/5qW+TyDSKFhyALVEbwV\nvFy9F+mz+XKajbUR7fcCQF2zZLvIJFAe100J/Uz+rTMuT7GZJUCkLgeaEvrG/Kjv\nuhhb76VDgjoKXr+oglL2W0p9nFO85mDoZqYNQgEjUGA=\n-----END RSA PRIVATE KEY-----\n
+NEXT_PUBLIC_SERVER_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDWC28RrWlGM7Q1EpYyiwqW7Yk7\nNLLfnlKiTHJBu8jw6tgxiMuil69oRyWCjs0/K7GND1Y5KvhMoHjVeug5dYq0BXH1\np2qQJdnqlYNDIpgAMLuE+oJm6L8stsnpwixcKCp9Lc/cdZ7xy472lZZPVrb/cHn0\nMpDeY0Kbh9GxRzWCyQIDAQAB\n-----END PUBLIC KEY-----\n
+
 # Optional: For testing
 TEST_EMAIL=your-email@your-company.com
 ```
+
+### Converting RSA Keys to Single-Line Format
+
+If your RSA private key is in multiline PEM format, convert it to single-line format with `\n` separators using this command:
+
+```bash
+# Convert private key to single-line format
+awk '{printf "%s\\n", $0}' private_key.pem > private_key_single_line.pem
+
+# Convert public key to single-line format
+awk '{printf "%s\\n", $0}' public_key.pem > public_key_single_line.pem
+```
+
+Copy the single-line content to the respective environment variables above.
 
 ## Troubleshooting
 

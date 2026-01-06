@@ -40,6 +40,12 @@ export default async function DepositPage({ params }: DepositPageProps) {
     redirect("/login");
   }
 
+  // Debug: Check public key
+  const publicKey = process.env.NEXT_PUBLIC_SERVER_PUBLIC_KEY;
+  console.log('Public key available:', !!publicKey);
+  console.log('Public key length:', publicKey?.length);
+  console.log('Public key starts with:', publicKey?.substring(0, 50));
+
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto space-y-8">
@@ -84,7 +90,10 @@ export default async function DepositPage({ params }: DepositPageProps) {
               </div>
             }
           >
-            <SecretForm organizationSlug={session.organizationSlug} />
+            <SecretForm
+              organizationSlug={session.organizationSlug}
+              publicKey={publicKey || ''}
+            />
           </Suspense>
         </Card>
 
