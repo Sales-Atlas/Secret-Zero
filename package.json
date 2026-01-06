@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:infisical": "tsx scripts/test-infisical-integration.ts"
+    "test:infisical": "tsx scripts/test-infisical-integration.ts",
+    "test:stytch": "tsx scripts/test-stytch-integration.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
@@ -35,7 +36,7 @@
     "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
-    "shadcn": "^3.6.2",
+    "shadcn": "^3.6.3",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
