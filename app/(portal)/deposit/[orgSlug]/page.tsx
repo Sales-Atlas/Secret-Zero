@@ -41,18 +41,18 @@ export default async function DepositPage({ params }: DepositPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
+    <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="mx-auto w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center">
-            <Lock className="w-10 h-10 text-emerald-400" />
+          <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+            <Lock className="w-10 h-10 text-primary" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-semibold text-white">
+            <h1 className="text-3xl font-semibold text-foreground">
               Secure Credential Transfer
             </h1>
-            <p className="text-slate-400 max-w-md mx-auto">
+            <p className="text-muted-foreground max-w-md mx-auto">
               Your data will be encrypted in your browser and securely
               transferred to our vault.
             </p>
@@ -61,26 +61,26 @@ export default async function DepositPage({ params }: DepositPageProps) {
 
         {/* Security badges */}
         <div className="flex flex-wrap justify-center gap-4">
-          <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
-            <Shield className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-slate-300">E2E Encryption</span>
+          <div className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-full">
+            <Shield className="w-4 h-4 text-primary" />
+            <span className="text-sm text-foreground">E2E Encryption</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-slate-300">Zero-Trust</span>
+          <div className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-full">
+            <CheckCircle className="w-4 h-4 text-primary" />
+            <span className="text-sm text-foreground">Zero-Trust</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-full">
-            <Lock className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-slate-300">SOC2 Compliant</span>
+          <div className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-full">
+            <Lock className="w-4 h-4 text-primary" />
+            <span className="text-sm text-foreground">SOC2 Compliant</span>
           </div>
         </div>
 
         {/* Form Card */}
-        <Card className="p-8 bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+        <Card className="p-8">
           <Suspense
             fallback={
               <div className="flex items-center justify-center py-12">
-                <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
               </div>
             }
           >
@@ -90,10 +90,10 @@ export default async function DepositPage({ params }: DepositPageProps) {
 
         {/* Info */}
         <div className="text-center space-y-2">
-          <p className="text-sm text-slate-500">
-            Logged in as <span className="text-slate-300">{session.email}</span>
+          <p className="text-sm text-muted-foreground">
+            Logged in as <span className="text-foreground">{session.email}</span>
           </p>
-          <p className="text-xs text-slate-600">
+          <p className="text-xs text-muted-foreground">
             Your data is encrypted before leaving your browser.
             No intermediary has access to it.
           </p>

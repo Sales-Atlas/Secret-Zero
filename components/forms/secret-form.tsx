@@ -95,20 +95,20 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
   if (submitStatus === "success") {
     return (
       <div className="text-center space-y-6 py-8">
-        <div className="mx-auto w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center">
-          <CheckCircle className="w-10 h-10 text-emerald-400" />
+        <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+          <CheckCircle className="w-10 h-10 text-primary" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-2xl font-semibold text-foreground">
             Data submitted successfully
           </h2>
-          <p className="text-slate-400">
+          <p className="text-muted-foreground">
             Your credentials have been securely saved in our vault.
           </p>
         </div>
         <Button
           onClick={() => setSubmitStatus("idle")}
-          className="bg-slate-700 hover:bg-slate-600 text-white"
+          variant="secondary"
         >
           Add more credentials
         </Button>
@@ -126,12 +126,12 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
         error={errors.url?.message}
       >
         <div className="relative">
-          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             {...register("url")}
             type="url"
             placeholder="https://app.example.com"
-            className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500"
+            className="pl-10"
             disabled={isPending}
           />
         </div>
@@ -145,12 +145,12 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
         error={errors.login?.message}
       >
         <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             {...register("login")}
             type="text"
             placeholder="admin@example.com"
-            className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500"
+            className="pl-10"
             disabled={isPending}
           />
         </div>
@@ -164,18 +164,18 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
         error={errors.password?.message}
       >
         <div className="relative">
-          <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+          <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             {...register("password")}
             type={showPassword ? "text" : "password"}
             placeholder="••••••••"
-            className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500"
+            className="pl-10 pr-10"
             disabled={isPending}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           >
             {showPassword ? (
               <EyeOff className="w-5 h-5" />
@@ -194,18 +194,18 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
         error={errors.apiToken?.message}
       >
         <div className="relative">
-          <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+          <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             {...register("apiToken")}
             type={showToken ? "text" : "password"}
             placeholder="sk-xxx..."
-            className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500"
+            className="pl-10 pr-10"
             disabled={isPending}
           />
           <button
             type="button"
             onClick={() => setShowToken(!showToken)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           >
             {showToken ? (
               <EyeOff className="w-5 h-5" />
@@ -218,11 +218,11 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
 
       {/* Error message */}
       {submitStatus === "error" && errorMessage && (
-        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+        <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-red-400 font-medium">Submission error</p>
-            <p className="text-red-400/80 text-sm">{errorMessage}</p>
+            <p className="text-destructive font-medium">Submission error</p>
+            <p className="text-destructive/80 text-sm">{errorMessage}</p>
           </div>
         </div>
       )}
@@ -231,11 +231,11 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
       <Button
         type="submit"
         disabled={isPending}
-        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3"
+        className="w-full font-medium py-3"
       >
         {isPending ? (
           <span className="flex items-center gap-2">
-            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
             Encrypting and sending...
           </span>
         ) : (
@@ -247,7 +247,7 @@ export function SecretForm({ organizationSlug }: SecretFormProps) {
       </Button>
 
       {/* Security note */}
-      <p className="text-xs text-slate-500 text-center">
+      <p className="text-xs text-muted-foreground text-center">
         By clicking &quot;Send&quot;, your data will be encrypted in your browser
         before transmission. Only the recipient can decrypt it.
       </p>
