@@ -83,12 +83,10 @@ export function SecretForm({ organizationSlug, publicKey }: SecretFormProps) {
           setSubmitStatus("error");
           setErrorMessage(result.error || "An error occurred");
         }
-      } catch (error) {
-        console.error("Encryption error:", error);
-        console.error("Error message:", error instanceof Error ? error.message : String(error));
-        console.error("Error stack:", error instanceof Error ? error.stack : "No stack");
+      } catch {
+        console.error("[SecretForm] Encryption error");
         setSubmitStatus("error");
-        setErrorMessage(error instanceof Error ? error.message : "Data encryption error");
+        setErrorMessage("Data encryption error");
       }
     });
   };

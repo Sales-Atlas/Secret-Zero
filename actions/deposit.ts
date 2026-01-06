@@ -80,8 +80,8 @@ export async function depositSecretAction(
         },
         privateKey
       );
-    } catch (error) {
-      console.error("[Deposit] Decryption error:", error);
+    } catch {
+      console.error("[Deposit] Decryption error");
       return {
         success: false,
         error: "Data decryption error.",
@@ -105,8 +105,8 @@ export async function depositSecretAction(
     let appPrefix;
     try {
       appPrefix = extractAppNameFromUrl(secretData.url);
-    } catch (error) {
-      console.error("[Deposit] URL parsing error:", error);
+    } catch {
+      console.error("[Deposit] URL parsing error");
       return {
         success: false,
         error: "Invalid URL address.",
@@ -122,8 +122,8 @@ export async function depositSecretAction(
         password: secretData.password,
         apiToken: secretData.apiToken,
       });
-    } catch (error) {
-      console.error("[Deposit] Infisical error:", error);
+    } catch {
+      console.error("[Deposit] Infisical error");
       return {
         success: false,
         error: "Vault save error.",
@@ -161,9 +161,9 @@ export async function depositSecretAction(
     secretData.login = null;
 
     return { success: true };
-  } catch (error) {
+  } catch {
     // Generic error - don't reveal details
-    console.error("[Deposit] Unexpected error:", error);
+    console.error("[Deposit] Unexpected error occurred");
     return {
       success: false,
       error: "An unexpected error occurred.",

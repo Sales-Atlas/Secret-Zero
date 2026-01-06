@@ -120,11 +120,35 @@ secretData.password = null;
 - **No unused imports** (auto-removed by linter)
 - **Fix all lint errors** before committing
 
+### Next.js Configuration
+- **Logging disabled**: `logging.incomingRequests: false` - prevents request body logging
+- **Taint API enabled**: `experimental.taint: true` - marks secrets as untransmittable to client
+- **Payload size limit**: `experimental.serverActions.bodySizeLimit: "100kb"`
+- **Security headers**: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, X-XSS-Protection
+
 ### Testing
 - **Integration tests**: Located in `scripts/` directory
 - **Test runner**: Use `tsx` for TypeScript test execution
 - **Test commands**: `pnpm test:infisical` or `pnpm test:stytch`
 - **No unit test framework configured**: Manual integration scripts only
+
+### Tech Stack Versions
+- **Next.js**: 16.1.1 with App Router only
+- **React**: 19.2.3 (Server Components preferred)
+- **TypeScript**: 5.x (strict mode enabled)
+- **Stytch**: @stytch/nextjs ^21.11.1, @stytch/vanilla-js ^5.44.0, stytch ^11.0.0
+- **Infisical**: @infisical/sdk ^4.0.4 (IMPORTANT: SDK v4 only - prior versions deprecated)
+- **Tailwind CSS**: v4 with mobile-first responsive design
+- **ShadCN UI**: ^3.6.3 with Base UI primitives
+- **Forms**: React Hook Form ^7.69.0 + Zod ^3.25.0
+
+### Language Policy
+- **All code and documentation must be in English**
+- This includes: variable names, function names, comments, JSDoc, documentation, commit messages
+- Never mix languages within the codebase
+
+### Development Log
+**Mandatory**: All changes must be logged in `development_log.md` with timestamp format `YYYYMMDDTHHMMZ`
 
 ## Critical Security Checklist
 
