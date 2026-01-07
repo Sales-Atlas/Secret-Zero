@@ -1,5 +1,10 @@
 # Vercel Deployment Guide
 
+This project is a Next.js app deployed on Vercel (Node.js runtime). It uses:
+- Stytch B2B (Discovery Magic Links) for authentication
+- Infisical for write-only secret storage
+- Client-side encryption (RSA public key in browser, RSA private key on server)
+
 ## Prerequisites
 
 1. Vercel account (https://vercel.com)
@@ -12,11 +17,11 @@
 Generate an RSA key pair for data encryption:
 
 ```bash
-# Generate private key (2048-bit)
-openssl genrsa -out private.pem 2048
+# Generate private key (2048-bit, PKCS#8)
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private.pem
 
 # Generate public key
-openssl rsa -in private.pem -pubout -out public.pem
+openssl pkey -in private.pem -pubout -out public.pem
 
 # Display private key (for copying)
 cat private.pem
@@ -25,7 +30,7 @@ cat private.pem
 cat public.pem
 ```
 
-**IMPORTANT:** Store the private key securely! Never commit it to the repository.
+**IMPORTANT:** Store the private key securely! Never commit it to the repository. This repo already ignores `*.pem` via `.gitignore`.
 
 ## Step 2: Connect Repository to Vercel
 
@@ -45,7 +50,17 @@ vercel login
 vercel link
 ```
 
-## Step 3: Configure Environment Variables
+## Step 3: Vercel Project Settings
+
+In Vercel Dashboard → Project → Settings:
+
+- **Framework Preset**: Next.js
+- **Node.js Version**: 20.x (recommended)
+- **Install Command**: `pnpm install --frozen-lockfile`
+- **Build Command**: `pnpm build`
+- **Output Directory**: (leave default; Next.js uses `.next`)
+
+## Step 4: Configure Environment Variables
 
 ### Via Vercel Dashboard
 
@@ -60,6 +75,7 @@ vercel link
 | `STYTCH_PROJECT_ID` | `project-xxx-xxx` | Production, Preview, Development |
 | `STYTCH_SECRET` | `secret-xxx-xxx` | Production, Preview, Development |
 | `NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN` | `public-token-xxx` | Production, Preview, Development |
+| `STYTCH_WEBHOOK_SECRET` | `whsec_xxx` | (Optional) Production, Preview, Development |
 
 #### Infisical Variables
 
@@ -68,9 +84,9 @@ vercel link
 | `INFISICAL_CLIENT_ID` | `xxx-xxx` | Production, Preview, Development |
 | `INFISICAL_CLIENT_SECRET` | `xxx-xxx` | Production, Preview, Development |
 | `INFISICAL_PROJECT_ID` | `xxx-xxx` | Production, Preview, Development |
-| `INFISICAL_SITE_URL` | `https://app.infisical.com` | Production, Preview, Development |
-| `INFISICAL_ENVIRONMENT` | `prod` | Production |
-| `INFISICAL_ENVIRONMENT` | `dev` | Preview, Development |
+| `INFISICAL_SITE_URL` | `https://app.infisical.com` | (Optional) Production, Preview, Development |
+| `INFISICAL_ENVIRONMENT` | `prod` | (Optional, default: `prod`) Production |
+| `INFISICAL_ENVIRONMENT` | `dev` | (Optional) Preview, Development |
 
 #### Encryption Variables
 
@@ -87,25 +103,34 @@ vercel link
 | `NEXT_PUBLIC_APP_URL` | `https://preview-xxx.vercel.app` | Preview |
 | `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | Development |
 
+`NEXT_PUBLIC_APP_URL` is used to build the Stytch Discovery redirect URL:
+- `${NEXT_PUBLIC_APP_URL}/authenticate`
+
+If you omit it, the app falls back to `http://localhost:3000`, which will break production magic links.
+
 #### Webhooks (optional)
 
 | Name | Value | Environment |
 |------|-------|-------------|
 | `ADMIN_WEBHOOK_URL` | `https://hooks.slack.com/...` | Production |
 | `WEBHOOK_SECRET` | `your-secret` | Production |
-| `STYTCH_WEBHOOK_SECRET` | `whsec_xxx` | Production |
+
+Notes:
+- `ADMIN_WEBHOOK_URL` receives metadata-only notifications (no secret values). If `WEBHOOK_SECRET` is set, requests include `X-Webhook-Signature` (HMAC SHA-256 hex).
+- Stytch webhook endpoint (optional): `POST https://your-domain.com/api/webhooks/stytch` (signature checked when `STYTCH_WEBHOOK_SECRET` is set).
 
 ### Via CLI
 
 ```bash
-# Add variable
-vercel env add STYTCH_PROJECT_ID
+# Add a variable (interactive)
+vercel env add STYTCH_PROJECT_ID production
 
 # Or from file
-vercel env add SERVER_PRIVATE_KEY < private.pem
+vercel env add SERVER_PRIVATE_KEY production < private.pem
+vercel env add NEXT_PUBLIC_SERVER_PUBLIC_KEY production < public.pem
 ```
 
-## Step 4: Deploy
+## Step 5: Deploy
 
 ### Automatic deploy (recommended)
 
@@ -125,7 +150,7 @@ vercel --prod
 vercel
 ```
 
-## Step 5: Configure Domain
+## Step 6: Configure Domain
 
 ### Add Custom Domain
 
@@ -143,13 +168,14 @@ After configuring the domain, update in Stytch Dashboard:
 2. **Authorized Origins:**
    - `https://secrets.yourcompany.com`
 
-## Step 6: Verify Deployment
+## Step 7: Verify Deployment
 
 ### Post-deployment Checklist
 
 - [ ] `/login` page works and displays form
 - [ ] Magic link is sent to email
 - [ ] Magic link authentication works
+- [ ] `/dashboard` loads after login
 - [ ] Deposit form is accessible after login
 - [ ] Secrets are saved in Infisical
 - [ ] Vercel logs do not contain sensitive data
@@ -163,11 +189,14 @@ After configuring the domain, update in Stytch Dashboard:
 
 2. **Authentication test:**
    - Click the link from email
-   - Check if it redirects to `/deposit/{org}`
+   - Check if it redirects to `/authenticate?...` and then to `/deposit/{orgSlug}`
 
 3. **Deposit test:**
    - Fill in the form
    - Check in Infisical if secret was saved
+
+4. **Stytch webhook (optional):**
+   - `GET https://your-domain.com/api/webhooks/stytch` should return `{ "status": "ok" }`
 
 ## Monitoring
 
@@ -197,6 +226,10 @@ Configure alerts in Vercel Dashboard:
 
 ## Troubleshooting
 
+### Problem: build/runtime fails with "Invalid environment variables configuration"
+
+This app validates env vars at startup (`env.ts`). Fix missing/invalid variables in Vercel and redeploy.
+
 ### Problem: "Environment variable not found"
 
 1. Check if variable is added for the correct environment
@@ -204,6 +237,18 @@ Configure alerts in Vercel Dashboard:
    ```bash
    vercel --prod --force
    ```
+
+### Problem: magic link redirects to `http://localhost:3000`
+
+Set `NEXT_PUBLIC_APP_URL` to your deployed domain for the target environment (Production/Preview). The redirect URL is built as `${NEXT_PUBLIC_APP_URL}/authenticate`.
+
+### Problem: Stytch error "Invalid redirect URL" / "unauthorized origin"
+
+1. Add the exact deployment domain in Stytch **Redirect URLs**:
+   - `https://your-domain.com/authenticate`
+2. Add the domain in Stytch **Authorized Origins**:
+   - `https://your-domain.com`
+3. If you rely on Vercel Preview URLs, you may need a stable staging domain because Preview URLs change per deployment.
 
 ### Problem: "Invalid RSA key"
 

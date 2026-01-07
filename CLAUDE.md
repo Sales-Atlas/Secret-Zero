@@ -20,6 +20,10 @@ pnpm start            # Start production server
 
 # Code Quality
 pnpm lint             # Run ESLint (Next.js config with React 19 & TypeScript rules)
+
+# Integration Tests
+pnpm test:infisical   # Test Infisical SDK integration
+pnpm test:stytch      # Test Stytch authentication flow
 ```
 
 ## Architecture & Data Flow

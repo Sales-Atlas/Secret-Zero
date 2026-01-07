@@ -107,7 +107,7 @@ To minimize administrative handling, JIT Provisioning must be enabled.
 According to recommendations 10, the user interface must not differentiate messages.
 
 * If a user tries to log in with an email that does not exist in the system, the UI must display: "Check your mailbox. If you have an account, we have sent a login link."  
-* In the case of the /api/submit-secret API endpoint, if the session has expired, a generic 401 error must be returned without technical details.
+* In the case of the secret deposit Server Action (`depositSecretAction`), if the session has expired/invalid, return a generic error (e.g., "Session expired. Please log in again.") without technical details.
 
 ## ---
 
@@ -119,13 +119,14 @@ Infisical will serve as the central vault.
 
 * **Infisical Organization:** Consulting Company (Owner).  
 * **Infisical Project:** Client-Secrets-Collection.  
-* **Environments:** Prod (Default dump location).
+* **Environments:** `prod` (default in code; configurable via `INFISICAL_ENVIRONMENT`).
 
 ### **4.2 Folder Hierarchy and Naming Convention**
 
 Client data will be stored in a folder-based structure, where the folder name corresponds to the client's organization slug from Stytch.  
-Path: /{Environment}/{Stytch\_Organization\_Slug}/  
-(e.g., /Prod/acme-corp-limited/)  
+Infisical folder path is represented by `secretPath` (folder) + `environment` (Infisical environment name).  
+Path (conceptually): /{Environment}/{Stytch\_Organization\_Slug}/  
+(e.g., environment=`prod`, secretPath=`/acme-corp-limited`)  
 Secret Keys Naming Convention:  
 Within the client folder, secrets will be saved as separate entries (Key-Value). The secret key is generated dynamically based on the domain provided in the form ("APPNAME").  
 Key formats:
@@ -137,7 +138,7 @@ Key formats:
 
 Example:  
 If the client provides URL https://pipedrive.com, the system will generate the prefix PIPEDRIVE.  
-Resulting secrets in the /Prod/acme-corp/ folder:
+Resulting secrets in the environment=`prod`, secretPath=`/acme-corp` folder:
 
 * PIPEDRIVE\_URL: https://pipedrive.com  
 * PIPEDRIVE\_API\_TOKEN: xoxb-12345...
@@ -191,24 +192,24 @@ The form must be a client component ("use client") to handle user interaction an
 Encryption Logic (Client-Side):  
 Before sending the form (onSubmit):
 
-1. Retrieve the server's **RSA Public Key**.  
+1. Retrieve the server's **RSA Public Key** (in this implementation it is provided via `NEXT_PUBLIC_SERVER_PUBLIC_KEY` and passed from a Server Component to the client form).  
 2. Generate a one-time symmetric **AES-256-GCM** key (sessionKey).  
 3. Create a JSON object containing filled fields: { url, login, password, apiToken }.  
 4. Encrypt the entire JSON object with the sessionKey.  
 5. Encrypt the sessionKey with the RSA public key.  
-6. Send payload: { encryptedData, encryptedSessionKey, iv } to Server Action.5
+6. Send payload: { encryptedData, encryptedKey, iv } to Server Action.5
 
-### **5.3 Server Action: depositSecret**
+### **5.3 Server Action: depositSecretAction**
 
 This function runs in the Node.js environment on Vercel.  
 **Processing Steps:**
 
-1. **Session Validation:** Retrieve stytch\_session\_jwt from cookies. Verify session using stytchClient.sessions.authenticateJwt().  
+1. **Session Validation:** Retrieve stytch\_session\_jwt from cookies. Verify session using `stytchClient.sessions.authenticate({ session_jwt })` (wrapped by `verifySessionJwt`). Also verify `organizationSlug` in the request matches the session organization.  
 2. **Decryption:** Decrypt input data with the server's private key.  
 3. **Domain Processing (Application Name Extraction):**  
    * Extract hostname from the url field (e.g., https://app.pipedrive.com/login -> app.pipedrive.com).  
    * Get the main part of the domain (e.g., pipedrive).  
-   * Normalize the name: convert to uppercase, remove special characters (e.g., PIPEDRIVE). This will be APPNAME.  
+   * Normalize the name: convert to uppercase (e.g., PIPEDRIVE). This will be APPNAME.  
 4. **Preparation of Secrets for Infisical:**  
    * For each filled field, create a Key-Value pair to send.  
    * SECRET\_KEY\_1: {APPNAME}\_URL = url  
@@ -216,7 +217,7 @@ This function runs in the Node.js environment on Vercel.
    * SECRET\_KEY\_3: {APPNAME}\_PASSWORD = password (if provided)  
    * SECRET\_KEY\_4: {APPNAME}\_API\_TOKEN = apiToken (if provided)  
 5. **Save to Infisical:**  
-   * Establish folder path: /{Environment}/{stytch\_org\_slug}/.  
+   * Establish `secretPath`: /{stytch\_org\_slug}/ and use `INFISICAL_ENVIRONMENT` (default: `prod`).  
    * Call InfisicalSDK in a loop or batch, creating each of the above secrets in this path.  
    * *Note:* Handle error if a secret with that name already exists (e.g., add random suffix or timestamp, if overwriting or duplication is business-acceptable).  
 6. **Notification (Webhook):** Send notification to admin (Webhook) containing client name and processed URL (without sensitive data).  
@@ -224,9 +225,9 @@ This function runs in the Node.js environment on Vercel.
 
 ### **5.4 Data Protection: React Taint API**
 
-The experimental experimental\_taintUniqueValue API available in Next.js must be utilized.22
+The React Taint API available in Next.js must be utilized.22
 
-* We mark INFISICAL\_CLIENT\_SECRET, SERVER\_PRIVATE\_KEY and any retrieved secrets as "tainted".  
+* We mark sensitive values (e.g., `env` / `process.env`, including INFISICAL\_CLIENT\_SECRET and SERVER\_PRIVATE\_KEY) as "tainted" during server startup (`instrumentation.ts`).  
 * If a developer accidentally tries to pass these objects to a client component (e.g., in props), Next.js will break the build or throw a runtime error, preventing data leakage to the browser.
 
 ### **5.5 Logging Disabling (Next.config.js)**
@@ -281,27 +282,28 @@ The section below is formatted as a direct instruction for the AI agent that wil
 
 ### **7.1 File Structure and Conventions**
 
-/src  
 /app  
 /(auth) \# Authentication routes group (public)  
 /login/page.tsx  
 /authenticate/page.tsx  
 /(portal) \# Protected routes group (requires session)  
-/dashboard/page.tsx \# Organization list / Selection  
-/deposit/\[orgId\]/page.tsx \# Deposit form  
-/api  
-/webhooks/stytch/route.ts \# Webhook handler  
-/lib  
-/stytch \# Stytch client (B2B)  
-/infisical \# Infisical client (Universal Auth)  
-/crypto \# Encryption/decryption logic (WebCrypto API \+ Node Crypto)  
-/utils \# Domain parsing (extractAppNameFromUrl)  
-/components  
-/forms/secret-form.tsx \# "use client" - with encryption logic and fields (URL, Login, Password, Token)  
+/dashboard/page.tsx  
+/deposit/\[orgSlug\]/page.tsx \# Deposit form  
+/api/webhooks/stytch/route.ts \# Webhook handler  
 /actions  
-deposit.ts \# "use server" - Server Action  
-env.ts \# Environment variables validation (Zod)  
-middleware.ts \# Stytch JWT verification on Edge
+auth.ts \# "use server" - auth actions (magic link, session exchange, logout)  
+deposit.ts \# "use server" - deposit Server Action  
+/lib  
+stytch.ts \# Stytch client (B2B)  
+infisical.ts \# Infisical client (Universal Auth)  
+crypto.ts \# Encryption/decryption logic (WebCrypto API + Node Crypto)  
+url-parser.ts \# Domain parsing (extractAppNameFromUrl)  
+taint.ts \# React Taint API initialization helpers  
+webhook.ts \# Admin notification webhook (metadata only)  
+/components/forms/secret-form.tsx \# "use client" - encryption logic and fields  
+/schemas/deposit.ts \# Zod schemas for form + decrypted payload  
+/env.ts \# Environment variables validation (Zod)  
+/instrumentation.ts \# Server startup hook (taint secrets)
 
 ### **7.2 Typing Instructions (TypeScript)**
 
