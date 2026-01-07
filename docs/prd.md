@@ -1,5 +1,7 @@
 # **Product Requirements Document (PRD): Inbound Secret Collection Portal**
 
+> Implementation note: This PRD is kept in sync with the current codebase. When in doubt, treat `actions/*`, `lib/*`, `schemas/*`, and `app/*` as the source of truth (see Section 7).
+
 ## **1\. Executive Summary and Strategic Context**
 
 ### **1.1 Introduction to the Problem**
@@ -44,15 +46,15 @@ One of the most serious risks identified in Vercel documentation is the way logs
 **Mitigation (Critical Requirement):**
 
 1. **Client-Side Encryption:** The application *must* encrypt data before sending. Backend should never receive secrets in plain JSON form.  
-2. **Next.js Configuration:** Logging of development and production requests must be explicitly disabled in next.config.js, using the logging: false option or granularizing incomingRequests.9  
-3. **Exception Sanitization:** All try-catch blocks on the backend must throw errors to generic messages ("Internal Server Error") and never log the req object or error in full if there is a risk that they contain sensitive data.
+2. **Next.js Configuration:** Disable request logging via `logging.incomingRequests: false` and URL logging via `logging.fetches.fullUrl: false` in `next.config.ts`.9  
+3. **Exception Sanitization:** In Server Actions and Route Handlers, return generic user-facing errors and log only sanitized error messages. Never log request bodies or decrypted payloads.
 
 ### **2.3 Risk Analysis: Account Enumeration (Stytch)**
 
 B2B applications are vulnerable to Account Enumeration attacks, where attackers try to guess employee email addresses or organization names to map client structure. Stytch documentation 10 indicates that endpoints such as "Send Magic Link" may return different error codes (200 vs 404) depending on whether the user exists.  
 **Mitigation:**
 
-1. **Opaque Errors:** Enforcement of "Opaque Errors" configuration in Stytch dashboard. This ensures the API always returns code 200, even if the user does not exist, preventing email database verification.10  
+1. **Opaque Errors (Application-Level):** The login UI and Server Action must return the same response whether the email exists or not (implemented in `actions/auth.ts`).10  
 2. **Discovery Flow:** Instead of logging into a specific organization (which reveals its existence), the user logs into the platform, and the system "discovers" their organizations after authentication.2
 
 ### **2.4 Risk Analysis: Access to Infisical**
@@ -124,9 +126,8 @@ Infisical will serve as the central vault.
 ### **4.2 Folder Hierarchy and Naming Convention**
 
 Client data will be stored in a folder-based structure, where the folder name corresponds to the client's organization slug from Stytch.  
-Infisical folder path is represented by `secretPath` (folder) + `environment` (Infisical environment name).  
-Path (conceptually): /{Environment}/{Stytch\_Organization\_Slug}/  
-(e.g., environment=`prod`, secretPath=`/acme-corp-limited`)  
+Infisical storage is represented by `secretPath` (folder path) + `environment` (Infisical environment name).  
+In this repository, the environment is selected via `INFISICAL_ENVIRONMENT` (default: `prod`), and secrets are written under `secretPath=/{Stytch_Organization_Slug}` within that environment (e.g., environment=`prod`, secretPath=`/acme-corp-limited`).  
 Secret Keys Naming Convention:  
 Within the client folder, secrets will be saved as separate entries (Key-Value). The secret key is generated dynamically based on the domain provided in the form ("APPNAME").  
 Key formats:
@@ -174,7 +175,7 @@ Thanks to permission inversion 3, even if application code tries to retrieve a l
 
 ### **5.1 Technology Choice: Next.js App Router**
 
-The application will be built based on **Next.js 14+ with App Router**.
+The application is built using **Next.js 16+ with App Router** (current repository: Next.js 16.1.1).
 
 * **Server Actions:** Allow handling form submissions directly on the server side without manually creating REST API endpoints, simplifying typing and validation.20  
 * **React Server Components (RSC):** Most logic (e.g., Infisical client initialization) remains on the server, drastically reducing the amount of JS code sent to the client and hiding business logic.
@@ -199,6 +200,8 @@ Before sending the form (onSubmit):
 5. Encrypt the sessionKey with the RSA public key.  
 6. Send payload: { encryptedData, encryptedKey, iv } to Server Action.5
 
+Implementation detail: In WebCrypto, the AES-GCM authentication tag is appended to the ciphertext. This implementation includes the auth tag inside `encryptedData` and the server splits the last 16 bytes during decryption (`lib/crypto.ts`).
+
 ### **5.3 Server Action: depositSecretAction**
 
 This function runs in the Node.js environment on Vercel.  
@@ -217,9 +220,9 @@ This function runs in the Node.js environment on Vercel.
    * SECRET\_KEY\_3: {APPNAME}\_PASSWORD = password (if provided)  
    * SECRET\_KEY\_4: {APPNAME}\_API\_TOKEN = apiToken (if provided)  
 5. **Save to Infisical:**  
-   * Establish `secretPath`: /{stytch\_org\_slug}/ and use `INFISICAL_ENVIRONMENT` (default: `prod`).  
+   * Establish `secretPath`: /{stytch\_org\_slug} and use `INFISICAL_ENVIRONMENT` (default: `prod`).  
    * Call InfisicalSDK in a loop or batch, creating each of the above secrets in this path.  
-   * *Note:* Handle error if a secret with that name already exists (e.g., add random suffix or timestamp, if overwriting or duplication is business-acceptable).  
+   * *Note:* This repository handles duplicates by adding a timestamp suffix `_YYYYMMDD_HHMMSS` and retrying (`lib/infisical.ts`).  
 6. **Notification (Webhook):** Send notification to admin (Webhook) containing client name and processed URL (without sensitive data).  
 7. **Memory Cleanup:** Overwrite password variables after sending.
 
@@ -230,29 +233,29 @@ The React Taint API available in Next.js must be utilized.22
 * We mark sensitive values (e.g., `env` / `process.env`, including INFISICAL\_CLIENT\_SECRET and SERVER\_PRIVATE\_KEY) as "tainted" during server startup (`instrumentation.ts`).  
 * If a developer accidentally tries to pass these objects to a client component (e.g., in props), Next.js will break the build or throw a runtime error, preventing data leakage to the browser.
 
-### **5.5 Logging Disabling (Next.config.js)**
+### **5.5 Logging Disabling (`next.config.ts`)**
 
-To meet the Vercel log leaks requirement, the configuration file must contain:
+To reduce the chance of accidental request/body logging on Vercel (and in development), this repository sets:
 
-JavaScript
+```ts
+// next.config.ts
+import type { NextConfig } from "next";
 
-// next.config.js  
-module.exports = {  
-  logging: {  
-    fetches: {  
-      fullUrl: false, // Hides URL parameters  
-    },  
-    incomingRequests: false, // Disables incoming request logging in dev/prod  
-  },  
-  experimental: {  
-    serverActions: {  
-      bodySizeLimit: '100kb', // Payload size limit  
-    },  
-    taint: true, // Enable Taint API  
-  },  
+const nextConfig: NextConfig = {
+  logging: {
+    fetches: { fullUrl: false },
+    incomingRequests: false,
+  },
+  experimental: {
+    serverActions: { bodySizeLimit: "100kb" },
+    taint: true,
+  },
 };
 
-This setting, combined with payload encryption, ensures that Vercel logs are "clean".9
+export default nextConfig;
+```
+
+This setting, combined with payload encryption, ensures that runtime logs do not contain secret values.9
 
 ## ---
 
@@ -266,7 +269,7 @@ Pure asymmetric encryption (RSA) has limitations regarding data size (dependent 
 
 1. **Transport Layer:** TLS 1.2/1.3 (enforced by Vercel).  
 2. **Application Layer (Session Key):** AES-256-GCM. GCM provides authenticated encryption (integrity check), protecting against on-the-fly ciphertext manipulation.  
-3. **Application Layer (Key Exchange):** RSA-OAEP with 2048-bit or 4096-bit key. OAEP padding is necessary to prevent padding oracle attacks.
+3. **Application Layer (Key Exchange):** RSA-OAEP (SHA-256) with a 2048-bit key (current implementation). OAEP padding is necessary to prevent padding oracle attacks.
 
 ### **6.3 Key Management**
 
@@ -276,59 +279,37 @@ Pure asymmetric encryption (RSA) has limitations regarding data size (dependent 
 
 ## ---
 
-**7\. Deployment Plan for AI Agents (Cursor/Windsurf Guidelines)**
+**7\. Repository Implementation Map (Current Code)**
 
-The section below is formatted as a direct instruction for the AI agent that will generate code.
+This section maps the requirements in this PRD to the implementation in this repository.
 
-### **7.1 File Structure and Conventions**
+### **7.1 Key Files**
 
-/app  
-/(auth) \# Authentication routes group (public)  
-/login/page.tsx  
-/authenticate/page.tsx  
-/(portal) \# Protected routes group (requires session)  
-/dashboard/page.tsx  
-/deposit/\[orgSlug\]/page.tsx \# Deposit form  
-/api/webhooks/stytch/route.ts \# Webhook handler  
-/actions  
-auth.ts \# "use server" - auth actions (magic link, session exchange, logout)  
-deposit.ts \# "use server" - deposit Server Action  
-/lib  
-stytch.ts \# Stytch client (B2B)  
-infisical.ts \# Infisical client (Universal Auth)  
-crypto.ts \# Encryption/decryption logic (WebCrypto API + Node Crypto)  
-url-parser.ts \# Domain parsing (extractAppNameFromUrl)  
-taint.ts \# React Taint API initialization helpers  
-webhook.ts \# Admin notification webhook (metadata only)  
-/components/forms/secret-form.tsx \# "use client" - encryption logic and fields  
-/schemas/deposit.ts \# Zod schemas for form + decrypted payload  
-/env.ts \# Environment variables validation (Zod)  
-/instrumentation.ts \# Server startup hook (taint secrets)
+* `app/(auth)/login/page.tsx` – Email capture UI with opaque response messaging.  
+* `app/(auth)/authenticate/page.tsx` – Discovery token verification and organization selection.  
+* `actions/auth.ts` – Server Actions for Discovery Flow (send magic link, authenticate, exchange session, logout).  
+* `lib/stytch.ts` – Stytch B2B SDK integration (Discovery Flow + session JWT verification).  
+* `app/(portal)/dashboard/page.tsx` – Protected landing page (requires valid session).  
+* `app/(portal)/deposit/[orgSlug]/page.tsx` – Protected deposit page; passes `NEXT_PUBLIC_SERVER_PUBLIC_KEY` to the client form.  
+* `components/forms/secret-form.tsx` – Client-side encryption and Server Action submission.  
+* `actions/deposit.ts` – Server Action that verifies session, decrypts payload, writes to Infisical, emits metadata audit log, and sends optional admin webhook notification.  
+* `lib/crypto.ts` – Hybrid encryption implementation (WebCrypto + Node.js crypto), plus RSA keypair generator.  
+* `schemas/deposit.ts` – URL normalization/validation and decrypted payload schema.  
+* `lib/url-parser.ts` – APPNAME extraction (`extractAppNameFromUrl`).  
+* `lib/infisical.ts` – Infisical Universal Auth client and write-only secret creation (with duplicate-key timestamp suffix).  
+* `lib/webhook.ts` – Optional admin webhook notifications (metadata only).  
+* `next.config.ts`, `instrumentation.ts`, `lib/taint.ts` – Log minimization and React Taint API configuration.  
 
-### **7.2 Typing Instructions (TypeScript)**
+### **7.2 Input Contracts and Validation**
 
-AI agent should apply strict typing. Do not use any.
+* Client → Server Action payload: `EncryptedPayload` (base64 strings) from `lib/crypto.ts`, plus `organizationSlug` (see `actions/deposit.ts`).  
+* Server-side validation happens after decryption: `decryptedSecretDataSchema` in `schemas/deposit.ts` (includes HTTPS normalization and URL validation).  
+* Secret naming is derived from `extractAppNameFromUrl()` in `lib/url-parser.ts` and uses `{APPNAME}_URL|LOGIN|PASSWORD|API_TOKEN`.
 
-* Use the zod library to define DTO (Data Transfer Objects) schemas.  
-* Example schema for Server Action:
+### **7.3 Admin Notifications (Optional)**
 
-TypeScript
-
-// schemas/deposit.ts  
-import { z } from "zod";
-
-export const DepositSchema = z.object({
-  encryptedData: z.string().base64(), // Base64 ciphertext (contains JSON with url, login, etc)
-  encryptedKey: z.string().base64(),  // Base64 encrypted AES key
-  iv: z.string().base64(),            // Base64 Initialization Vector
-  organizationSlug: z.string(),
-});
-
-### **7.3 Data Access Layer (DAL) Guidelines**
-
-* Code calling InfisicalSDK and StytchClient must be located exclusively in the /lib directory.  
-* DAL functions must accept simple arguments and return simple objects (Plain Old JavaScript Objects) to be compatible with Server Actions serialization.  
-* Never export Infisical/Stytch client instances outside the file where they are created.
+* Configure `ADMIN_WEBHOOK_URL` to receive `secret.deposited` events with metadata only (no secret values).  
+* Configure `WEBHOOK_SECRET` to sign payloads via `X-Webhook-Signature` (`lib/webhook.ts`).
 
 ## ---
 
@@ -369,10 +350,10 @@ Implementation of this PRD is recommended in close cooperation with the consulti
 | :---- | :---- | :---- |
 | **Stytch B2B** | Approved | Requires enabling "Opaque Errors" and "JIT Restricted". |
 | **Infisical** | Approved | Requires use of Universal Auth and permission inversion (Deny Read). |
-| **Vercel** | Conditionally Approved | Requires disabling logs in next.config.js and payload encryption. |
+| **Vercel** | Conditionally Approved | Requires disabling logs in `next.config.ts` and payload encryption. |
 | **Next.js** | Approved | Requires use of Server Actions and Taint API. |
 
-This document is ready to be passed to the engineering team and AI agents for implementation commencement.
+This document is ready to be used as an implementation-aligned reference for ongoing development and security review.
 
 ### **End of Report / PRD**
 
