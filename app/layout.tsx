@@ -13,7 +13,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Secure Secret Portal | ISCP",
+  title: "Secure Secret Portal",
   description: "Securely transfer your credentials to our vault",
   robots: "noindex, nofollow", // Do not index - internal application
 };
