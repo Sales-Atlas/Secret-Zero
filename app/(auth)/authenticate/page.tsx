@@ -102,17 +102,17 @@ export default function AuthenticatePage() {
   // Loading state
   if (isAuthenticating) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
-        <Card className="w-full max-w-md p-8 bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md p-8">
           <div className="text-center space-y-6">
-            <div className="mx-auto w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+            <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
             </div>
             <div className="space-y-2">
-              <h1 className="text-2xl font-semibold text-white">
+              <h1 className="text-2xl font-semibold text-foreground">
                 Verifying...
               </h1>
-              <p className="text-slate-400">
+              <p className="text-muted-foreground">
                 Verifying your login link
               </p>
             </div>
@@ -125,21 +125,21 @@ export default function AuthenticatePage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
-        <Card className="w-full max-w-md p-8 bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md p-8">
           <div className="text-center space-y-6">
-            <div className="mx-auto w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
-              <AlertCircle className="w-8 h-8 text-red-400" />
+            <div className="mx-auto w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
+              <AlertCircle className="w-8 h-8 text-destructive" />
             </div>
             <div className="space-y-2">
-              <h1 className="text-2xl font-semibold text-white">
+              <h1 className="text-2xl font-semibold text-foreground">
                 Login Error
               </h1>
-              <p className="text-slate-400">{error}</p>
+              <p className="text-muted-foreground">{error}</p>
             </div>
             <Button
               onClick={() => router.push("/login")}
-              className="bg-slate-700 hover:bg-slate-600 text-white"
+              variant="secondary"
             >
               Return to login
             </Button>
@@ -151,19 +151,19 @@ export default function AuthenticatePage() {
 
   // Organization selection
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
-      <Card className="w-full max-w-md p-8 bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md p-8">
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center">
-              <Lock className="w-8 h-8 text-blue-400" />
+            <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+              <Lock className="w-8 h-8 text-primary" />
             </div>
             <div className="space-y-2">
-              <h1 className="text-2xl font-semibold text-white">
+              <h1 className="text-2xl font-semibold text-foreground">
                 Select Organization
               </h1>
-              <p className="text-slate-400">
+              <p className="text-muted-foreground">
                 Which organization do you want to log in to?
               </p>
             </div>
@@ -176,32 +176,33 @@ export default function AuthenticatePage() {
                 key={org.organizationId}
                 onClick={() => handleSelectOrganization(org.organizationId)}
                 disabled={isPending}
-                className="w-full p-4 flex items-center gap-4 bg-slate-900/50 border border-slate-600 rounded-lg hover:bg-slate-700/50 hover:border-slate-500 transition-all group disabled:opacity-50"
+                className="w-full p-4 flex items-center gap-4 bg-muted border border-border rounded-lg hover:bg-accent hover:border-accent-foreground/20 transition-all group disabled:opacity-50"
               >
-                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-blue-400" />
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-primary" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="font-medium text-white">
+                  <div className="font-medium text-foreground">
                     {org.organizationName}
                   </div>
-                  <div className="text-sm text-slate-500">
+                  <div className="text-sm text-muted-foreground">
                     {org.organizationSlug}
                   </div>
                 </div>
-                <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" />
+                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
               </button>
             ))}
           </div>
 
           {organizations.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-slate-400">
+              <p className="text-muted-foreground">
                 No organizations found associated with your account.
               </p>
               <Button
                 onClick={() => router.push("/login")}
-                className="mt-4 bg-slate-700 hover:bg-slate-600 text-white"
+                variant="secondary"
+                className="mt-4"
               >
                 Return to login
               </Button>
