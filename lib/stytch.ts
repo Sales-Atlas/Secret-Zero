@@ -39,8 +39,12 @@ export interface SessionData {
  * Discovery flow allows users to log in without knowing their organization
  */
 export async function sendDiscoveryMagicLink(email: string): Promise<void> {
+  const baseUrl = env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const redirectUrl = `${baseUrl}/authenticate`;
+
   await stytchClient.magicLinks.email.discovery.send({
     email_address: email,
+    discovery_redirect_url: redirectUrl,
   });
 }
 
