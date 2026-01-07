@@ -6,6 +6,10 @@ function normalizeHttpUrl(input: string): string {
     return trimmed;
   }
 
+  if (/^http:\/\//i.test(trimmed)) {
+    return trimmed.replace(/^http:\/\//i, 'https://');
+  }
+
   if (trimmed.startsWith("//")) {
     return `https:${trimmed}`;
   }
@@ -17,7 +21,7 @@ function normalizeHttpUrl(input: string): string {
 function isValidHttpUrl(urlString: string): boolean {
   try {
     const parsed = new URL(urlString);
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    if (parsed.protocol !== "https:") {
       return false;
     }
 
@@ -26,12 +30,8 @@ function isValidHttpUrl(urlString: string): boolean {
       return false;
     }
 
-    if (hostname === "localhost") {
-      return true;
-    }
-
-    // IPv6 hostnames contain ":" (e.g., "::1")
-    if (hostname.includes(":")) {
+    // IPv6 addresses should be enclosed in brackets in URLs.
+    if (hostname.startsWith('[') && hostname.endsWith(']')) {
       return true;
     }
 
@@ -49,7 +49,18 @@ function isValidHttpUrl(urlString: string): boolean {
     }
 
     // Keep hostname validation simple but avoid obvious invalid characters
-    if (!/^[a-z0-9.-]+$/i.test(hostname)) {
+    if (!/^[a-z0-9._-]+$/i.test(hostname)) {
+      return false;
+    }
+
+    const labels = hostname.split('.');
+    if (labels.some((label) => label.length === 0)) {
+      return false;
+    }
+
+    // Disallow labels that start or end with a hyphen
+    const labelPattern = /^[a-z0-9_](?:[a-z0-9_-]*[a-z0-9_])?$/i;
+    if (!labels.every((label) => labelPattern.test(label))) {
       return false;
     }
 

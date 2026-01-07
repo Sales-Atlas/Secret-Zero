@@ -1,10 +1,12 @@
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import { verifySessionJwt } from "@/lib/stytch";
-import { SecretForm } from "@/components/forms/secret-form";
-import { Card } from "@/components/ui/card";
-import { Lock, Shield, CheckCircle, AlertCircle } from "lucide-react";
+import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { Lock, Shield, CheckCircle, AlertCircle } from 'lucide-react';
+
+import { env } from '@/env';
+import { verifySessionJwt } from '@/lib/stytch';
+import { SecretForm } from '@/components/forms/secret-form';
+import { Card } from '@/components/ui/card';
 
 interface DepositPageProps {
   params: Promise<{
@@ -40,7 +42,7 @@ export default async function DepositPage({ params }: DepositPageProps) {
     redirect("/login");
   }
 
-  const publicKey = process.env.NEXT_PUBLIC_SERVER_PUBLIC_KEY;
+  const publicKey = env.NEXT_PUBLIC_SERVER_PUBLIC_KEY;
 
   // Check for required configuration before rendering form
   if (!publicKey) {

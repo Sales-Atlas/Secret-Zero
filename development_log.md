@@ -1,3 +1,4 @@
+20260107T1145Z: [Use validated env for public key in deposit page] -> Replaced direct process.env access with env.NEXT_PUBLIC_SERVER_PUBLIC_KEY in app/(portal)/deposit/[orgSlug]/page.tsx so the page uses the Zod-validated environment configuration.
 20260107T1020Z: [Sanitize validation error logging in deposit action] -> Removed Zod error object from console.error() at actions/deposit.ts:95. Previously logged `parseResult.error` which can contain field paths, validation rules, and structural details that could expose implementation details or sensitive data patterns. Changed to generic log message "Validation error" matching the sanitization pattern already applied to other error handlers in the same file (decryption, URL parsing, Infisical errors per 20260107T0820Z entry). All error logging in deposit action now follows minimal logging security principle.
 20260102T2115Z: [Fixed URL parser bug with 2-character domain names] -> Fixed extractAppNameFromUrl() in lib/url-parser.ts where country-code TLD detection incorrectly stripped any 2-character domain segment (e.g., 'ab' in 'app.ab.io'). Replaced naive length-based heuristic with explicit list of known second-level country-code TLDs (co, ac, gov, edu, org, net, mil, nom, sch). Now only strips second-level domain if it matches known list AND TLD is 2 characters (indicating country code). Fixes issue where legitimate short domain names were incorrectly identified as country codes and removed.
 20251229T1200Z: [zamien rules w .cursor/rules na nowa wersje project rules zgodnie z ponizsza specyfikacja # Rules Rules provide system-level instructions to Agent...] -> Zmigrowano .mdc do folderów Project Rules w .cursor/rules/.
@@ -47,3 +48,21 @@
 20260107T0845Z: [Accept URLs without https:// in deposit form] -> Updated URL validation to accept inputs like "pipedrive.com" by normalizing to https://, and adjusted the URL input field to avoid browser URL-type validation blocking scheme-less entries.
 20260107T0851Z: [Make success CTA use primary button style] -> Changed the "Add more credentials" button in components/forms/secret-form.tsx to use the ShadCN `default` variant (theme `primary` color) instead of `secondary`.
 20260107T1000Z: [Fixed poor UX for missing NEXT_PUBLIC_SERVER_PUBLIC_KEY] -> Added server-side validation in app/(portal)/deposit/[orgSlug]/page.tsx to check for NEXT_PUBLIC_SERVER_PUBLIC_KEY before rendering SecretForm. If the environment variable is missing, users now see an explicit configuration error page with clear instructions instead of being allowed to fill out the entire form only to encounter "Data encryption error" on submit. Added AlertCircle icon import. This prevents users from wasting time filling out the form when the application is misconfigured. Build verified successful with TypeScript type checking passed.
+20260107T1134Z: [Align auth layout styling with theme variables] -> Updated Suspense fallback styles in app/(auth)/layout.tsx to use bg-background and primary-based borders instead of hardcoded slate/blue colors, matching the auth pages' CSS variable usage.
+20260107T1157Z: [Sanitize client-side encryption error logging] -> Updated components/forms/secret-form.tsx catch block to log only the error message (no stack trace) using a guarded Error check, keeping logging minimal while avoiding exposure of internal details.
+20260107T1202Z: [Use root-relative doc links] -> Updated markdown links in docs/STYTCH_SETUP.md, docs/INFISICAL_TESTING.md, and docs/SECURITY_TESTS.md to use root-relative paths (e.g., /lib/stytch.ts) for portability across platforms.
+20260107T1204Z: [Remove Stytch org setup script docs] -> Removed the SDK script instructions from docs/STYTCH_SETUP.md, clarified dashboard-first organization configuration with API as optional, and updated troubleshooting language to avoid script references.
+
+20260107T1207Z: [Fix IPv6 URL validation] -> Narrowed IPv6 hostname validation to require bracketed literals (e.g., [::1]) so non-IPv6 hostnames containing ":" no longer pass.
+
+20260107T1208Z: [Disallow single-label hostnames] -> Removed localhost bypass in URL validation so only IPv4, bracketed IPv6, or dotted domains pass.
+
+20260107T1209Z: [Allow underscore in hostname validation] -> Updated hostname regex to accept underscores for internal URLs like app_staging.example.com.
+
+20260107T1211Z: [Enforce HTTPS normalization] -> normalizeHttpUrl now upgrades http:// inputs to https:// to avoid insecure URLs.
+
+20260107T1213Z: [Enforce HTTPS-only validation] -> isValidHttpUrl now only permits https: to align with normalization and prevent insecure URLs.
+
+20260107T1215Z: [Tighten hostname label validation] -> Added label checks to prevent leading/trailing hyphens and empty labels from consecutive dots.
+
+20260107T1218Z: [Normalize HTTP scheme case-insensitively] -> Upgraded normalizeHttpUrl to convert any http:// (any casing) to https:// so HTTPS-only validation does not reject uppercase schemes.
