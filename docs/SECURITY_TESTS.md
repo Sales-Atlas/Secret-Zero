@@ -317,8 +317,8 @@ secretData.login = null;
 **Goal:** Verify client-side encryption and server-side decryption work correctly
 
 **Implementation:**
-- Client: [lib/crypto.ts:72-119](/lib/crypto.ts#L72-L119) - `encryptPayload`
-- Server: [lib/crypto.ts:129-169](/lib/crypto.ts#L129-L169) - `decryptPayload`
+- Client: [lib/crypto.ts:89-129](/lib/crypto.ts#L89-L129) - `encryptPayload`
+- Server: [lib/crypto.ts:139-179](/lib/crypto.ts#L139-L179) - `decryptPayload`
 
 **Test Method:**
 

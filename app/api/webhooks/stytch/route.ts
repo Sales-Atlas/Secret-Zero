@@ -119,9 +119,9 @@ async function handleMemberCreated(data: Record<string, unknown>) {
   const organization = data.organization as Record<string, unknown> | undefined;
 
   if (member && organization) {
+    // Security: avoid logging PII (like email addresses) from webhook payloads.
     console.log("[Stytch Webhook] New member:", {
       memberId: member.member_id,
-      email: member.email_address,
       organizationId: organization.organization_id,
       organizationName: organization.organization_name,
     });
@@ -142,7 +142,6 @@ async function handleMemberDeleted(data: Record<string, unknown>) {
   if (member) {
     console.log("[Stytch Webhook] Member deleted:", {
       memberId: member.member_id,
-      email: member.email_address,
     });
 
     // Here you can add logic for:

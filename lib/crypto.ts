@@ -24,6 +24,11 @@ export interface EncryptedPayload {
   iv: string;             // Base64
 }
 
+// PERF: `crypto.subtle.importKey()` is relatively expensive; cache the Promise so repeated
+// submissions in the same session don't re-parse PEM and re-import the same RSA key.
+const rsaPublicKeyCache = new Map<string, Promise<CryptoKey>>();
+const textEncoder = new TextEncoder();
+
 /**
  * Converts PEM to ArrayBuffer for WebCrypto
  */
@@ -54,6 +59,29 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 }
 
 /**
+ * Imports (and caches) an RSA public key for WebCrypto.
+ */
+async function getRsaPublicKey(publicKeyPem: string): Promise<CryptoKey> {
+  const cached = rsaPublicKeyCache.get(publicKeyPem);
+  if (cached) {
+    return cached;
+  }
+
+  const publicKeyBuffer = pemToArrayBuffer(publicKeyPem);
+  const promise = crypto.subtle.importKey(
+    "spki",
+    publicKeyBuffer,
+    { name: "RSA-OAEP", hash: "SHA-256" },
+    false,
+    ["encrypt"]
+  );
+
+  rsaPublicKeyCache.set(publicKeyPem, promise);
+  promise.catch(() => rsaPublicKeyCache.delete(publicKeyPem));
+  return promise;
+}
+
+/**
  * Converts Base64 to ArrayBuffer
  */
 export async function encryptPayload(
@@ -72,7 +100,7 @@ export async function encryptPayload(
 
   // 3. Encrypt JSON data with AES key
   const jsonData = JSON.stringify(data);
-  const encodedData = new TextEncoder().encode(jsonData);
+  const encodedData = textEncoder.encode(jsonData);
   
   const encryptedDataBuffer = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
@@ -81,14 +109,7 @@ export async function encryptPayload(
   );
 
   // 4. Import RSA public key
-  const publicKeyBuffer = pemToArrayBuffer(publicKeyPem);
-  const publicKey = await crypto.subtle.importKey(
-    "spki",
-    publicKeyBuffer,
-    { name: "RSA-OAEP", hash: "SHA-256" },
-    false,
-    ["encrypt"]
-  );
+  const publicKey = await getRsaPublicKey(publicKeyPem);
 
   // 5. Export AES key and encrypt it with RSA key
   const rawSessionKey = await crypto.subtle.exportKey("raw", sessionKey);

@@ -198,7 +198,7 @@ Your Infisical integration is correctly configured:
 **"Duplicate secret gets timestamp suffix" fails**
 - Check error messages for API issues
 - Verify folder creation permissions
-- Review timestamp suffix logic in [lib/infisical.ts](/lib/infisical.ts:60-69)
+- Review timestamp suffix logic in [lib/infisical.ts:60-69](/lib/infisical.ts#L60-L69)
 
 ## Security Validation
 
