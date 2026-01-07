@@ -107,7 +107,7 @@ export function SecretForm({ organizationSlug, publicKey }: SecretFormProps) {
         </div>
         <Button
           onClick={() => setSubmitStatus("idle")}
-          variant="secondary"
+          variant="default"
         >
           Add more credentials
         </Button>
@@ -120,7 +120,7 @@ export function SecretForm({ organizationSlug, publicKey }: SecretFormProps) {
       {/* URL - required */}
       <Field
         label="Application URL"
-        description="Full address of login page or API"
+        description="Full address of login page or API (https:// optional)"
         invalid={!!errors.url}
         error={errors.url?.message}
       >
@@ -128,8 +128,12 @@ export function SecretForm({ organizationSlug, publicKey }: SecretFormProps) {
           <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             {...register("url")}
-            type="url"
-            placeholder="https://app.example.com"
+            type="text"
+            inputMode="url"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            placeholder="app.example.com"
             className="pl-10"
             disabled={isPending}
           />
