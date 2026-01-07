@@ -2,6 +2,10 @@
 
 ## 2026-01-07
 
+- `20260107T2245Z` — **Simplify RSA public key caching**: Removed the unnecessary async IIFE in `lib/crypto.ts` and imported the RSA public key directly after PEM conversion; synchronous conversion errors now reject via the async function naturally.
+- `20260107T1950Z` — **Verify docs links against code**: Fixed doc link drift by renaming `docs/prd.md` to `docs/PRD.md` (case-correct for case-sensitive filesystems) and updating stale code line anchors in `docs/SECURITY_TESTS.md` and `docs/INFISICAL_TESTING.md`.
+- `20260107T1517Z` — **Reduce PII in Stytch webhook logs**: Removed email address logging from `app/api/webhooks/stytch/route.ts` to avoid persisting PII in server logs.
+- `20260107T1506Z` — **Cache WebCrypto RSA key import**: Added a small in-memory cache in `lib/crypto.ts` so `crypto.subtle.importKey()` for the same RSA public key PEM runs once per session, speeding up repeated form submissions without changing encryption behavior.
 - `20260107T1440Z` — **Consolidate duplicate CLAUDE.md files**: Removed duplicate root `CLAUDE.md` and merged unique content (Integration Tests section) into `.claude/CLAUDE.md`. Project now has a single source of truth for Claude Code guidance in the canonical `.claude/CLAUDE.md` location.
 - `20260107T1356Z` — **Fix MD034 in README**: Wrapped bare URL `https://zawlodzki.pl` in angle brackets to satisfy markdownlint MD034.
 - `20260107T1343Z` — **Add Cursor rule for development log format**: Added `.cursor/rules/development-log/RULE.md` to keep future `development_log.md` entries consistent.
