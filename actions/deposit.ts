@@ -92,7 +92,7 @@ export async function depositSecretAction(
     const parseResult = decryptedSecretDataSchema.safeParse(decryptedData);
     
     if (!parseResult.success) {
-      console.error("[Deposit] Validation error:", parseResult.error);
+      console.error("[Deposit] Validation error");
       return {
         success: false,
         error: "Invalid form data.",

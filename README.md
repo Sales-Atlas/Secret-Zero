@@ -16,6 +16,7 @@ Key security assumptions:
 
 Operational assumptions:
 - **No database to run or maintain** — the app is stateless and relies on [Stytch](https://stytch.com) (auth) and [Infisical](https://infisical.com) (secret storage).
+- **Organizations in Stytch** can be created via API as part of client onboarding flow, but can also be created directly in Stytch dashboard. This application does not contain a management dashboard.
 
 ## Documentation
 
