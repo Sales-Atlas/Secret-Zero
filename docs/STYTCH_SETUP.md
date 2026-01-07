@@ -28,7 +28,7 @@ These settings apply to **all organizations** in your Stytch project and are con
 
 These settings apply to **specific organization** only. Each organization (client) can have different security policies.
 
-**Location:** API/SDK calls via `organizations.create()` or `organizations.update()`
+**Location:** Stytch Dashboard (Management → Organizations) or API/SDK calls via `organizations.create()` or `organizations.update()`
 
 **What's configured here:**
 - **JIT Provisioning** - Email domain restrictions for auto-provisioning
@@ -131,59 +131,9 @@ curl --request POST \
 **⚠️ CRITICAL**:
 - These settings are **per-organization**, NOT global
 - You must configure **each client organization separately**
-- Organization-level settings are configured via **Stytch Dashboard** or **API/SDK**
+- Organization-level settings are configured via **Stytch Dashboard** (recommended) or **API/SDK**
 
-### Configuration via SDK
-
-Create a script `scripts/setup-stytch-org.ts`:
-
-```typescript
-#!/usr/bin/env tsx
-import { B2BClient } from 'stytch';
-import { config } from 'dotenv';
-
-config({ path: '.env.local' });
-
-const client = new B2BClient({
-  project_id: process.env.STYTCH_PROJECT_ID!,
-  secret: process.env.STYTCH_SECRET!,
-});
-
-async function configureOrganization(organizationId: string) {
-  const response = await client.organizations.update({
-    organization_id: organizationId,
-
-    // JIT Provisioning: Only allow specific email domains
-    email_jit_provisioning: "RESTRICTED",
-    email_allowed_domains: [
-      "client1.com",
-      "client2.com",
-      "trusted-partner.eu"
-    ],
-
-    // Email Invites: Restrict to allowed domains
-    email_invites: "RESTRICTED",
-
-    // MFA Policy: Disable SMS OTP (Toll Fraud risk)
-    mfa_methods: "RESTRICTED",
-    allowed_mfa_methods: ["totp"], // Only TOTP, excludes sms_otp
-
-    // Auth Methods: Restrict to Email Magic Links only
-    auth_methods: "RESTRICTED",
-    allowed_auth_methods: ["magic_link"],
-  });
-
-  console.log('Organization configured:', response.organization.organization_slug);
-}
-
-// Replace with your organization ID from Step 4
-configureOrganization('organization-test-xxxx-xxxx-xxxx-xxxx');
-```
-
-Run the script:
-```bash
-pnpm tsx scripts/setup-stytch-org.ts
-```
+### Configuration via API (Optional)
 
 ### Using cURL
 
@@ -387,7 +337,7 @@ Project: "Secret-Zero Production"
 ### Problem: User cannot register
 
 **Checks:**
-1. Verify JIT Provisioning settings (API call or script)
+1. Verify JIT Provisioning settings (Dashboard or API)
 2. Check if user's email domain is in `email_allowed_domains`
 3. Ensure `email_jit_provisioning` is set to `RESTRICTED` (not `NOT_ALLOWED`)
 
@@ -421,8 +371,8 @@ await client.organizations.update({
 ### Common Pitfalls
 - ❌ Wrong Assumption: "I configured email_jit_provisioning once, so all organizations are set"
   - ✅ **Reality**: You must configure **each organization separately**
-- ❌ Configuring via non-existent dashboard toggles
-  - ✅ **Reality**: Most organization settings are configured via API/SDK
+- ❌ Looking for project-level toggles for organization settings
+  - ✅ **Reality**: Organization settings are configured per organization in the Dashboard or via API
 
 ## Additional Resources
 
@@ -431,4 +381,4 @@ await client.organizations.update({
 - [Organization Settings Guide](https://stytch.com/docs/b2b/guides/organizations/org-settings)
 - [Stytch B2B API Reference](https://stytch.com/docs/b2b/api)
 - [Update Organization API](https://stytch.com/docs/b2b/api/update-organization)
-- [Secret-Zero Implementation](../lib/stytch.ts)
+- [Secret-Zero Implementation](/lib/stytch.ts)

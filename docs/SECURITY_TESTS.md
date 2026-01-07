@@ -148,7 +148,7 @@ pnpm test:stytch
 
 **Goal:** Verify backend cannot read secrets
 
-**Already Tested:** Automated in [scripts/test-infisical-integration.ts:248-268](../scripts/test-infisical-integration.ts#L248-L268)
+**Already Tested:** Automated in [scripts/test-infisical-integration.ts:248-268](/scripts/test-infisical-integration.ts#L248-L268)
 
 **Manual Verification (if needed):**
 
@@ -180,7 +180,7 @@ try {
 
 **Implementation Check:**
 
-File: [actions/auth.ts:25-36](../actions/auth.ts#L25-L36)
+File: [actions/auth.ts:25-36](/actions/auth.ts#L25-L36)
 
 ```typescript
 export async function sendMagicLinkAction(email: string): Promise<ActionResult> {
@@ -224,7 +224,7 @@ export async function sendMagicLinkAction(email: string): Promise<ActionResult> 
 
 **Implementation Check:**
 
-File: [actions/deposit.ts:133-162](../actions/deposit.ts#L133-L162)
+File: [actions/deposit.ts:133-162](/actions/deposit.ts#L133-L162)
 
 ```typescript
 // 6. Audit log (without secret values!)
@@ -287,7 +287,7 @@ secretData.login = null;
 
 **Goal:** Verify expired sessions are rejected
 
-**Implementation:** Session validation in [actions/deposit.ts:34-52](../actions/deposit.ts#L34-L52)
+**Implementation:** Session validation in [actions/deposit.ts:34-52](/actions/deposit.ts#L34-L52)
 
 **Manual Test:**
 
@@ -317,8 +317,8 @@ secretData.login = null;
 **Goal:** Verify client-side encryption and server-side decryption work correctly
 
 **Implementation:**
-- Client: [lib/crypto.ts:72-119](../lib/crypto.ts#L72-L119) - `encryptPayload`
-- Server: [lib/crypto.ts:129-169](../lib/crypto.ts#L129-L169) - `decryptPayload`
+- Client: [lib/crypto.ts:72-119](/lib/crypto.ts#L72-L119) - `encryptPayload`
+- Server: [lib/crypto.ts:129-169](/lib/crypto.ts#L129-L169) - `decryptPayload`
 
 **Test Method:**
 
@@ -413,7 +413,7 @@ tsx scripts/test-crypto.ts
 
 **Goal:** Verify webhook notifications don't leak secrets
 
-**Implementation:** [lib/webhook.ts](../lib/webhook.ts)
+**Implementation:** [lib/webhook.ts](/lib/webhook.ts)
 
 **Test Script:** `scripts/test-webhook-security.ts`
 
@@ -506,7 +506,7 @@ Invalid signature accepted: false
 - [ ] B2B SaaS project type
 - [ ] Email Magic Links enabled
 - [ ] SMS OTP disabled
-- [ ] **Opaque Errors enabled** (verified in code: [actions/auth.ts:33](../actions/auth.ts#L33))
+- [ ] **Opaque Errors enabled** (verified in code: [actions/auth.ts:33](/actions/auth.ts#L33))
 - [ ] Discovery Flow configured
 - [ ] JIT Provisioning: RESTRICTED
 - [ ] Redirect URLs configured (`{APP_URL}/authenticate`)
@@ -520,7 +520,7 @@ Invalid signature accepted: false
 - [ ] RBAC test: `pnpm test:infisical` - all tests PASS
 
 ### Vercel Configuration
-- [ ] All environment variables set (validated by [env.ts](../env.ts))
+- [ ] All environment variables set (validated by [env.ts](/env.ts))
 - [ ] RSA private key as secret: `SERVER_PRIVATE_KEY`
 - [ ] Public key exposed: `NEXT_PUBLIC_SERVER_PUBLIC_KEY`
 - [ ] NEXT_PUBLIC_APP_URL correct
@@ -596,7 +596,7 @@ In case a security issue is detected:
 - **No API Routes:** Application uses Server Actions exclusively
 - **Session Validation:** Happens in server actions, not middleware
 - **Test Framework:** Integration tests use tsx scripts, not Jest/Vitest
-- **Log Safety:** Secrets explicitly nulled after use ([actions/deposit.ts:156-161](../actions/deposit.ts#L156-L161))
+- **Log Safety:** Secrets explicitly nulled after use ([actions/deposit.ts:156-161](/actions/deposit.ts#L156-L161))
 
 ### Common Pitfalls
 
