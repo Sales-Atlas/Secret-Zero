@@ -56,19 +56,6 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 /**
  * Converts Base64 to ArrayBuffer
  */
-export function base64ToArrayBuffer(base64: string): ArrayBuffer {
-  const binaryString = atob(base64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes.buffer;
-}
-
-/**
- * [CLIENT-SIDE] Encrypts data before sending to server
- * Uses AES-256-GCM for data and RSA-OAEP for session key
- */
 export async function encryptPayload(
   data: Record<string, unknown>,
   publicKeyPem: string

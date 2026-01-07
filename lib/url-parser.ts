@@ -83,18 +83,3 @@ export function extractAppNameFromUrl(url: string): string {
     );
   }
 }
-
-/**
- * Validates if a URL is well-formed
- *
- * @param url - URL to validate
- * @returns true if URL is valid
- */
-export function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}

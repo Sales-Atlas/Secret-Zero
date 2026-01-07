@@ -107,11 +107,3 @@ export async function logoutAction(): Promise<never> {
   }
   redirect("/login");
 }
-
-/**
- * Gets session JWT from cookie
- */
-export async function getSessionJwt(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
-}
