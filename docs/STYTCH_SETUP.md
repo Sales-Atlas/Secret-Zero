@@ -266,6 +266,39 @@ awk '{printf "%s\\n", $0}' private_key.pem > private_key_single_line.pem
 # Convert public key to single-line format
 awk '{printf "%s\\n", $0}' public_key.pem > public_key_single_line.pem
 ```
+Project: "Secret-Zero Production"
+├── Project Settings (Global)
+│   ├── Redirect URLs:
+│   │   - https://app.secret-zero.com/authenticate
+│   │   - https://app.secret-zero.com/dashboard
+│   ├── OAuth: Google OAuth credentials
+│   └── Branding: "Secret-Zero" email templates
+│
+├── Organization: "Acme Corporation"
+│   ├── email_allowed_domains: ["acme.com"]
+│   ├── email_jit_provisioning: "RESTRICTED"
+│   ├── allowed_auth_methods: ["magic_link"]
+│   └── mfa_policy: "OPTIONAL"
+│
+├── Organization: "Tech Startup Inc"
+│   ├── email_allowed_domains: ["techstartup.com", "techstartup.eu"]
+│   ├── email_jit_provisioning: "RESTRICTED"
+│   ├── allowed_auth_methods: ["magic_link", "oauth"]
+│   └── mfa_policy: "REQUIRED_FOR_ALL"
+│
+└── Organization: "Enterprise Client"
+    ├── email_allowed_domains: ["enterprise.com"]
+    ├── email_jit_provisioning: "RESTRICTED"
+    ├── allowed_auth_methods: ["magic_link"]
+    ├── mfa_policy: "REQUIRED_FOR_ALL"
+    └── allowed_mfa_methods: ["totp"] // SMS OTP disabled
+```
+
+### Benefits of Multi-Tenancy
+- ✅ Different clients can have different security requirements
+- ✅ Enterprise clients can require MFA, startups can make it optional
+- ✅ Some clients can use OAuth, others only magic links
+- ✅ Each client's users are isolated to their allowed domains
 
 ## Multi-Tenancy Architecture
 
