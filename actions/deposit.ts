@@ -80,8 +80,8 @@ export async function depositSecretAction(
         },
         privateKey
       );
-    } catch {
-      console.error("[Deposit] Decryption error");
+    } catch (error) {
+      console.error("[Deposit] Decryption error", { message: error instanceof Error ? error.message : String(error) });
       return {
         success: false,
         error: "Data decryption error.",
