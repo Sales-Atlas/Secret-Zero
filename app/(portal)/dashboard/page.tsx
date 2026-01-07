@@ -39,7 +39,7 @@ export default async function DashboardPage() {
           </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold text-foreground">
-              Welcome to Secret Portal
+              Welcome to Secure Portal
             </h1>
             <p className="text-muted-foreground">
               Logged in as <span className="text-foreground">{session.email}</span>
