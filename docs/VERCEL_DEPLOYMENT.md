@@ -108,6 +108,23 @@ In Vercel Dashboard → Project → Settings:
 
 If you omit it, the app falls back to `http://localhost:3000`, which will break production magic links.
 
+#### Footer Configuration (optional)
+
+| Name | Value | Environment |
+|------|-------|-------------|
+| `NEXT_PUBLIC_FOOTER_LOGO_PATH` | `/logo.svg` | (Optional, default: `/logo.svg`. Set empty to hide) All environments |
+| `NEXT_PUBLIC_FOOTER_LOGO_URL` | `https://your-company.com` | (Optional, defaults to `NEXT_PUBLIC_APP_URL` or `/`) All environments |
+| `NEXT_PUBLIC_FOOTER_PRIVACY_URL` | `https://your-company.com/privacy` | (Optional, defaults to `NEXT_PUBLIC_APP_URL` or `/`) All environments |
+| `NEXT_PUBLIC_FOOTER_COMPANY_NAME` | `Secret Zero by Grzegorz Zawłodzki` | (Optional, default provided) All environments |
+
+Notes:
+- These variables control the footer displayed on all pages
+- `NEXT_PUBLIC_FOOTER_LOGO_PATH` supports either a path to an asset in `public/` (e.g. `public/your-logo.png` → set `NEXT_PUBLIC_FOOTER_LOGO_PATH=/your-logo.png`) or an `https://...` URL to a remote logo
+- If you set it to empty/blank, the footer logo is hidden (this project conditionally renders the logo in `components/footer.tsx`, `Footer`)
+- `NEXT_PUBLIC_FOOTER_LOGO_URL` is the URL to navigate to when the logo is clicked (set to empty to disable the link)
+- `NEXT_PUBLIC_FOOTER_PRIVACY_URL` is the URL for the privacy policy link (set to empty to disable the link)
+- `NEXT_PUBLIC_FOOTER_COMPANY_NAME` is the company name displayed in the footer
+
 #### Webhooks (optional)
 
 | Name | Value | Environment |

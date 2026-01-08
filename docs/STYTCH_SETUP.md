@@ -232,73 +232,13 @@ The following features are enabled by default for B2B projects:
 
 ## Environment Variables
 
-Create or update your `.env.local` file with the following variables:
+After completing Stytch configuration, you'll need to set the following environment variables:
 
-```env
-# Stytch Configuration
-STYTCH_PROJECT_ID=project-test-xxx-xxx
-STYTCH_SECRET=secret-test-xxx-xxx
-NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN=public-token-test-xxx
+- `STYTCH_PROJECT_ID` - From API Keys section
+- `STYTCH_SECRET` - From API Keys section
+- `NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN` - Public token for frontend
 
-# Infisical Configuration (from INFISICAL_SETUP.md)
-INFISICAL_CLIENT_ID=xxx-xxx-xxx
-INFISICAL_CLIENT_SECRET=xxx-xxx-xxx
-INFISICAL_PROJECT_ID=xxx-xxx-xxx
-INFISICAL_SITE_URL=https://app.infisical.com
-INFISICAL_ENVIRONMENT=prod
-
-# RSA Encryption Keys (from VERCEL_DEPLOYMENT.md)
-SERVER_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----\n
-NEXT_PUBLIC_SERVER_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----\n
-
-# Optional: For testing
-TEST_EMAIL=your-email@your-company.com
-```
-
-### Converting RSA Keys to Single-Line Format
-
-If your RSA private key is in multiline PEM format, convert it to single-line format with `\n` separators:
-
-```bash
-# Convert private key to single-line format
-awk '{printf "%s\\n", $0}' private_key.pem > private_key_single_line.pem
-
-# Convert public key to single-line format
-awk '{printf "%s\\n", $0}' public_key.pem > public_key_single_line.pem
-```
-Project: "Secret-Zero Production"
-├── Project Settings (Global)
-│   ├── Redirect URLs:
-│   │   - https://app.secret-zero.com/authenticate
-│   │   - https://app.secret-zero.com/dashboard
-│   ├── OAuth: Google OAuth credentials
-│   └── Branding: "Secret-Zero" email templates
-│
-├── Organization: "Acme Corporation"
-│   ├── email_allowed_domains: ["acme.com"]
-│   ├── email_jit_provisioning: "RESTRICTED"
-│   ├── allowed_auth_methods: ["magic_link"]
-│   └── mfa_policy: "OPTIONAL"
-│
-├── Organization: "Tech Startup Inc"
-│   ├── email_allowed_domains: ["techstartup.com", "techstartup.eu"]
-│   ├── email_jit_provisioning: "RESTRICTED"
-│   ├── allowed_auth_methods: ["magic_link", "oauth"]
-│   └── mfa_policy: "REQUIRED_FOR_ALL"
-│
-└── Organization: "Enterprise Client"
-    ├── email_allowed_domains: ["enterprise.com"]
-    ├── email_jit_provisioning: "RESTRICTED"
-    ├── allowed_auth_methods: ["magic_link"]
-    ├── mfa_policy: "REQUIRED_FOR_ALL"
-    └── allowed_mfa_methods: ["totp"] // SMS OTP disabled
-```
-
-### Benefits of Multi-Tenancy
-- ✅ Different clients can have different security requirements
-- ✅ Enterprise clients can require MFA, startups can make it optional
-- ✅ Some clients can use OAuth, others only magic links
-- ✅ Each client's users are isolated to their allowed domains
+For complete environment variable setup including Infisical and encryption keys, see [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md).
 
 ## Multi-Tenancy Architecture
 

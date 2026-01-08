@@ -3,9 +3,9 @@ import { cookies } from "next/headers";
 import { verifySessionJwt } from "@/lib/stytch";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, ArrowRight, LogOut } from "lucide-react";
+import { Lock, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { logoutAction } from "@/actions/auth";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 async function getSession() {
   const cookieStore = await cookies();
@@ -76,15 +76,7 @@ export default async function DashboardPage() {
               <p className="text-sm text-muted-foreground">Organization</p>
               <p className="text-foreground font-medium">{session.organizationSlug}</p>
             </div>
-            <form action={logoutAction}>
-              <Button
-                type="submit"
-                variant="ghost"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
-            </form>
+            <LogoutButton />
           </div>
         </Card>
 
