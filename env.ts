@@ -29,6 +29,12 @@ const envSchema = z.object({
   // Next.js
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+
+  // Footer configuration
+  NEXT_PUBLIC_FOOTER_LOGO_PATH: z.string().default("/logo.svg"),
+  NEXT_PUBLIC_FOOTER_LOGO_URL: z.union([z.string().url(), z.literal("")]).optional(),
+  NEXT_PUBLIC_FOOTER_PRIVACY_URL: z.union([z.string().url(), z.literal("")]).optional(),
+  NEXT_PUBLIC_FOOTER_COMPANY_NAME: z.string().default("Secret Zero by Grzegorz Zawłodzki"),
 });
 
 /**
@@ -70,6 +76,10 @@ export const clientEnv = {
   NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN: env.NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN,
   NEXT_PUBLIC_SERVER_PUBLIC_KEY: env.NEXT_PUBLIC_SERVER_PUBLIC_KEY,
   NEXT_PUBLIC_APP_URL: env.NEXT_PUBLIC_APP_URL,
+  NEXT_PUBLIC_FOOTER_LOGO_PATH: env.NEXT_PUBLIC_FOOTER_LOGO_PATH,
+  NEXT_PUBLIC_FOOTER_LOGO_URL: env.NEXT_PUBLIC_FOOTER_LOGO_URL,
+  NEXT_PUBLIC_FOOTER_PRIVACY_URL: env.NEXT_PUBLIC_FOOTER_PRIVACY_URL,
+  NEXT_PUBLIC_FOOTER_COMPANY_NAME: env.NEXT_PUBLIC_FOOTER_COMPANY_NAME,
 } as const;
 
 /**

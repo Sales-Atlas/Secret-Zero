@@ -1,6 +1,8 @@
 # Secret-Zero
 
-**Secret-Zero** is an Inbound Secret Collection Portal (ISCP): a secure B2B app that lets consulting clients deposit sensitive credentials (passwords, API tokens, keys) directly into your [Infisical](https://infisical.com) vault without email/Slack.
+**Secret-Zero** is an Inbound Secret Collection Portal (ISCP): a secure B2B app that lets consulting clients deposit sensitive credentials (passwords, API tokens, keys) directly into your [Infisical](https://infisical.com) vault without email/Slack. Think of it as a **digital safe deposit box** where clients can securely deposit secrets that only your authorized team can access.
+
+![Secure Credential Transfer Form](public/form_screenshot.png)
 
 ## What it solves
 - Prevents “secret sprawl” and insecure credential sharing across communication tools.

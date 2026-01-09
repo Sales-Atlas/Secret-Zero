@@ -1,5 +1,33 @@
 # Development Log
 
+## 2026-01-09
+
+- `20260109T0847Z` — **Document LogoutButton component signature**: Added a JSDoc block and an explicit JSX return type annotation for `LogoutButton` in `components/auth/logout-button.tsx`.
+- `20260109T0849Z` — **Preserve empty footer env values**: Switched footer `logoUrl` and `privacyUrl` fallbacks from `||` to `??` in `components/footer.tsx` so empty strings are not treated as missing.
+- `20260109T0851Z` — **Update global primary color**: Changed the theme `--primary` color in `app/globals.css` to `oklch(0.478 0.202 271.5)` (equivalent of `#3A48CC`) and aligned `--sidebar-primary` to use the same token.
+- `20260109T0907Z` — **Rename Open Source badge**: Updated the deposit page badge label from “Open Source” to “Secure Design” and switched the icon to a padlock in `app/(portal)/deposit/[orgSlug]/page.tsx`.
+- `20260109T0920Z` — **Improve dark-mode primary contrast**: Set dark-mode `--primary` to `oklch(0.62 0.202 271.5)` and switched `--primary-foreground` to dark text to meet WCAG contrast for links and primary buttons in dark mode.
+- `20260109T0925Z` — **Allow empty footer URL env vars**: Updated `NEXT_PUBLIC_FOOTER_LOGO_URL` and `NEXT_PUBLIC_FOOTER_PRIVACY_URL` validation in `env.ts` to accept either a valid URL or an explicit empty string.
+- `20260109T0929Z` — **Disable footer links on empty URLs**: Updated `components/footer.tsx` to treat `NEXT_PUBLIC_FOOTER_LOGO_URL=""` and `NEXT_PUBLIC_FOOTER_PRIVACY_URL=""` as “disable link” (avoid `href=""`), and documented this in `env.example` and `docs/VERCEL_DEPLOYMENT.md`.
+- `20260109T0931Z` — **Clarify footer logo requirements**: Updated `docs/VERCEL_DEPLOYMENT.md` to state `NEXT_PUBLIC_FOOTER_LOGO_PATH` must be a non-empty path to an asset in `public/`, blank values are unsupported (Next.js `next/image` errors), and hiding the logo requires conditional rendering in `components/footer.tsx`.
+- `20260109T0932Z` — **Hide footer logo on empty path**: Updated `components/footer.tsx` to conditionally render the logo only when `NEXT_PUBLIC_FOOTER_LOGO_PATH` is non-empty, and documented the behavior in `env.example` and `docs/VERCEL_DEPLOYMENT.md`.
+- `20260109T0938Z` — **Support remote footer logos**: Updated `components/footer.tsx` so `NEXT_PUBLIC_FOOTER_LOGO_PATH` can be an `https://...` URL by using a custom `next/image` loader with `unoptimized`, and documented the option in `env.example` and `docs/VERCEL_DEPLOYMENT.md`.
+- `20260109T0940Z` — **Deduplicate deposit page layout**: Refactored `app/(portal)/deposit/[orgSlug]/page.tsx` to share a single layout and `LogoutButton` container across the missing-public-key and normal branches, conditionally rendering only the differing content.
+- `20260109T0942Z` — **Remove duplicate app logo asset**: Deleted `app/logo.svg` (duplicate of `public/logo.svg`) to avoid confusion; the footer uses `/logo.svg` which resolves to `public/logo.svg`.
+- `20260109T0946Z` — **Fix build type error in LogoutButton**: Removed the `JSX.Element` return type annotation from `components/auth/logout-button.tsx` to avoid `Cannot find namespace 'JSX'` during `next build` TypeScript checking.
+- `20260109T0947Z` — **Fix remote logo build error**: Updated `components/footer.tsx` to render remote `NEXT_PUBLIC_FOOTER_LOGO_PATH` values with a plain `<img>` (instead of passing a function `loader` prop), avoiding the Next.js build error about passing functions to Client Components.
+- `20260109T0949Z` — **Silence remote logo lint warning**: Added a targeted ESLint disable for `@next/next/no-img-element` on the remote-logo `<img>` fallback in `components/footer.tsx`.
+
+## 2026-01-08
+
+- `20260108T1605Z` — **Document footer environment variables**: Added footer configuration variables to `env.example` and `docs/VERCEL_DEPLOYMENT.md` for easy reference during setup and deployment.
+- `20260108T1602Z` — **Fix footer to always be visible**: Changed layout from `min-h-screen` to `h-full` with flexbox. The footer now sticks to the bottom of the viewport when content is short, and scrolls naturally when content is long, ensuring it's always visible without being pushed below the fold.
+- `20260108T1553Z` — **Add global footer component**: Created a reusable footer component with logo, company name, and privacy policy link. Configuration is pulled from environment variables (`NEXT_PUBLIC_FOOTER_*`) with sensible fallbacks. The footer is now visible on all pages through the root layout. Moved logo.svg to the public directory for proper static asset serving.
+- `20260108T1514Z` — **Add logout to deposit page**: Added a logout button to the deposit form page so users can end their session without returning to the dashboard.
+- `20260108T1519Z` — **Move deposit logout to top**: Placed the logout button at the top of the deposit page so it's always visible without scrolling.
+- `20260108T1525Z` — **Unify logout button styling**: Centralized the logout button into a shared component, reused it on dashboard and deposit pages, and removed the global body text override that made the button invisible on light backgrounds.
+- `20260108T1529Z` — **Update Open Source badge icon**: Swapped the deposit page badge icon to better match the "Open Source" label.
+
 ## 2026-01-07
 
 - `20260107T2245Z` — **Simplify RSA public key caching**: Removed the unnecessary async IIFE in `lib/crypto.ts` and imported the RSA public key directly after PEM conversion; synchronous conversion errors now reject via the async function naturally.
